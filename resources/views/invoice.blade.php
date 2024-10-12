@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>فاتورة</title>
-    <!-- Tailwind CSS CDN -->
+   
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
 
@@ -14,18 +14,7 @@
     <div class="card mt-12 m-6 bg-gray-50 rounded-xl">
         <!-- row -->
         <div class="flex flex-wrap flex-row">
-            <div id="title-invoice" class="flex justify-between max-w-full px-4 py-4 w-full">
-                <p class="text-xl font-bold mt-3 mb-5">Invoice #{{ $invoice->id }}</p>
-                <button type="button" id="btn-invoice" onclick="exportToPDF()"
-                    class="py-2 px-4 inline-block text-center mb-3 rounded leading-5 text-red-800 bg-white border border-red-700 hover:text-white hover:bg-red-600 hover:ring-0 hover:border-white focus:outline-none focus:ring-0">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                        class="ltr:mr-2 rtl:ml-2 inline-block bi bi-printer mr-2" viewBox="0 0 16 16">
-                        <path d="M2.5 8a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"></path>
-                        <path d="M5 1a2 2 0 0 0-2 2v2H2a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h1v1a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-1h1a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-1V3a2 2 0 0 0-2-2H5zM4 3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2H4V3zm1 5a2 2 0 0 0-2 2v1H2a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v-1a2 2 0 0 0-2-2H5zm7 2v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1z">
-                        </path>
-                    </svg>Export PDF
-                </button>
-            </div>
+
 
             <div class="flex-shrink max-w-full px-4 w-full mb-6" id="invoice">
                 <div class="p-6 bg-white rounded-lg shadow-lg">
@@ -111,23 +100,24 @@
                                 </tr>
                                 @endforeach
                             </tbody>
-                            <tfoot>
+                            <tfoot class="flex mt-6 flex-col justify-right gap-2 mr-3">
                                 <tr>
                                     <td colspan="2"></td>
-                                    <td class="text-center"><b>الإجمالي</b></td>
-                                    <td class="text-center">{{ $invoice->total_price, 2 }} DH</td>
+                                    <td class="text-center"><b>الإجمالي :</b></td>
+                                    <td class="text-center">{{ number_format($invoice->total_price, 2) }} DH</td>
                                 </tr>
                                 <tr>
                                     <td colspan="2"></td>
-                                    <td class="text-center"><b>المبلغ المدفوع</b></td>
-                                    <td class="text-center">{{ $invoice->paid_amount, 2}} DH</td>
+                                    <td class="text-center"><b>المبلغ المدفوع :</b></td>
+                                    <td class="text-center">{{ number_format($invoice->paid_amount, 2) }} DH</td>
                                 </tr>
                                 <tr>
                                     <td colspan="2"></td>
-                                    <td class="text-center"><b>المبلغ المتبقي</b></td>
-                                    <td class="text-center">{{ $invoice->remaining_amount, 2 }} DH</td>
+                                    <td class="text-center"><b>المبلغ المتبقي :</b></td>
+                                    <td class="text-center">{{ number_format($invoice->remaining_amount, 2) }} DH</td>
                                 </tr>
                             </tfoot>
+
                         </table>
                     </div>
                 </div>
@@ -135,11 +125,6 @@
         </div>
     </div>
 
-    <script>
-        function exportToPDF() {
-            // Add your PDF export logic here
-        }
-    </script>
 
 </body>
 

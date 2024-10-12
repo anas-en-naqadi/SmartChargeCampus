@@ -51,35 +51,7 @@ class UserController extends Controller
 
         return response($user);
     }
-    public function updateAdminProfile(Request $request)
-    {
 
-        $user = getSimpleUser();
-        // Validate request data
-        $validated = $request->validate([
-            'email' => 'required|email',
-            'first_name' => 'required|string', // Corrected 'fitst_name' to 'first_name'
-            'last_name' => 'required|string',  // Corrected 'require' to 'required'
-            'phone' => 'required|string'
-        ]);
-
-
-        CleanInputs($validated);
-
-
-        // Update user information
-        $user->update([
-            'name' => $validated['first_name'] . " " . $validated['last_name'],
-            'email' => $validated['email'],
-            'phone' => $validated['phone']
-        ]);
-
-        $nameParts = explode(' ', $user->name);
-        $user->first_name = $nameParts[0];
-        $user->last_name = isset($nameParts[1]) ? $nameParts[1] : '';
-
-        return  response(['user' => $user, 'message' => 'Profile Updated Successfully'], 200);
-    }
 
     public function destroy(User $user)
     {
@@ -94,18 +66,7 @@ class UserController extends Controller
         return response('successfful');
     }
 
-    public function changeUserStatus(Request $request)
-    {
-        try {
-            $user = User::findOrFail($request->user_id);
-            $user->status = $request->status;
-            $user->save();
-            Redis::del('users');
-            return response()->json(['message' => 'User has been ' . ($request->status == 'active' ? 'activated' : 'deactivated') . ' successfully'], 200);
-        } catch (Exception $e) {
-            return response()->json(['message' => 'oops, something went wrong'], 500);
-        }
-    }
+
     public function storeUser(Request $request)
     {
         $validatedData = $request->validate(['email' => 'required|email|unique:users,email', 'phone' => 'required|string|min:10', 'name' => 'string|required', 'is_admin' => 'required|boolean']);
@@ -162,48 +123,29 @@ class UserController extends Controller
         return response()->json($user);
     }
 
-    public function setAsAdmin(Request $request)
-    {
-        $id = $request->validate(['user_id' => 'numeric|required'])['user_id'];
-        $user = User::find($id);
-        $user->is_admin = 1;
-        $user->save();
-        Redis::del('users');
-        return response()->json(['message' => 'this account now is admin'], 200);
-    }
-
- 
 
 
 
-    public function moveUserToBlackList($id)
-    {
-        $user = User::whereId($id)->get();
-        Redis::del('users');
-        return response()->json(['message' => $user->name . ' moved To blacklist !!']);
-    }
+
+
+
+
     public function getLoggedUser()
     {
+      $cacheKey = 'user';
+      $cachedData = getCachedData($cacheKey,function(){
         $user = getSimpleUser();
-        $nameParts = explode(' ', $user->name);
-        $user->first_name = $nameParts[0];
-        $user->last_name = isset($nameParts[1]) ? $nameParts[1] : '';
-        return response()->json($user);
+        return $user;
+      });
+
+        return response()->json($cachedData);
     }
 
     public function getLastCustomers()
     {
-        $customers = User::with(['orders' => function ($query) {
-            $query->where('status', 'completed')
-                ->latest();
-        }])
-            ->whereHas('orders', function ($query) {
-                $query->where('status', 'completed');
-            })
-            ->latest()
-            ->limit(7)
-            ->get();
+        $clients = Client::latest()->limit(7)->get();
 
-        return response()->json($customers);
+
+        return response()->json($clients);
     }
 }

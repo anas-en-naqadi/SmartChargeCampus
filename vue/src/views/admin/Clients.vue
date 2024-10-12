@@ -39,16 +39,23 @@
                 <Column field="phone" class="border-b-[1px] w-[5rem] text-center" header="رقم الهاتف">
                 </Column>
 
-                <Column field="created_at" class="border-b-[1px] text-center w-full" header="أضيف في" sortable>
+                <Column field="created_at" class="border-b-[1px] text-center w-full m-auto " header="أضيف في"  sortable>
                     <template #body="{ data }">
                         <span>{{ common.formatDate(data.created_at) }}</span>
                     </template>
                 </Column>
 
                 <template #expansion="{data}">
-                    <div class="p-4">
+                    <div class="p-2.5">
 
-                        <div class="flex justify-between items-center mb-4">
+                        <div :class="[
+    data.sells.length ? 'mb-4' : '-mb-10' ,
+    'flex',
+    'justify-between',
+    'items-center',
+    '-mt-6',
+
+]">
 
                             <p class="mb-4 text-2xl flex font-extrabold p-8">
 
@@ -66,7 +73,7 @@
                                     </span>
                             </p>
                         </div>
-                        <DataTable :value="data.sells" removableSort :paginator="true"
+                        <DataTable v-if="data.sells.length" :value="data.sells" removableSort :paginator="true"
                             class="p-datatable-sites -mt-5 m-6 " showGridlines :rows="10" dataKey="id"
                             tableStyle="min-width: 30rem;" stripedRows
                             :rowClassName="'border-t text-center border-gray-200'" filterDisplay="menu"
@@ -109,7 +116,7 @@
                                 </template>
                             </Column>
 
-                            <Column field="paid_price" header="الدفع">
+                            <Column field="paid_price" header="الدفع" sortable>
                                 <template #body="{ data }">
                                     <span>{{ common.formatNumber(data.paid_price) }} درهم</span>
                                 </template>
@@ -176,7 +183,7 @@
                         <span class="relative">
                             <i
                                 class="pi pi-search absolute top-2/4 -mt-2 left-3 text-surface-400 white:text-surface-600" />
-                            <InputText placeholder="Search" class="pl-10 py-2" />
+                            <InputText disabled placeholder="Search" class="pl-10 py-2" />
                         </span>
                         <Button type="button" icon="pi pi-filter-slash" label="إزالة"
                             class="p-button-outlined bg-white py-2 px-4 border border-blue-500 rounded-md text-blue-800 hover:text-white hover:bg-blue-500" />
@@ -211,7 +218,7 @@
 
 <script setup>
 import store from "../../store";
-import { ref, onMounted,computed } from "vue";
+import { ref, onMounted } from "vue";
 import common from "../../utils/common";
 import { useToast } from "primevue/usetoast";
 const clients = ref([]);

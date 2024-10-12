@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\SellResource;
 use App\Models\Sell;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -16,7 +17,7 @@ class SellController extends Controller
         $cacheKey = 'sells';
         $cacheData = getCachedData($cacheKey, function () {
         $sells = Sell::latest()->with("client")->get();
-        return $sells;
+        return SellResource::collection($sells);
     });
     return response()->json($cacheData);
     }
@@ -34,15 +35,8 @@ class SellController extends Controller
             'end_date.after_or_equal' => 'يجب أن يكون تاريخ الانتهاء بعد أو يساوي تاريخ البدء.',
         ]);
         $sells = Sell::whereBetween('created_at', [$data['start_date'], $data['end_date']])->get();
-          return response()->json($sells,200);
+          return response()->json(SellResource::collection($sells),200);
        }
 
-       public function downloadInvoiceAsPdf(){
-        // Pass the data to the invoice.blade.php view
-        $invoice = Sell::with('products', 'client')->first();
-        $pdf = Pdf::loadView('invoice',['invoice'=>$invoice]);
-
-        // Return the generated PDF to download
-        return $pdf->download('invoice_' . 1 . '.pdf');
-       }
+      
 }

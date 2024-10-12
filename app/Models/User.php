@@ -21,9 +21,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(Client::class, 'user_id')->where("role",  "client");
     }
-    public function purchases(){
-        return $this->hasManyThrough(Product::class,Purchase::class, 'user_id','id','id',"product_id");
+    public function purchases() {
+        return $this->hasMany(Purchase::class);
     }
+
     public function sells(){
         return $this->hasMany(Sell::class, 'user_id');
     }

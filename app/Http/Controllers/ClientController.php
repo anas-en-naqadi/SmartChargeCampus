@@ -23,6 +23,8 @@ class ClientController extends Controller
         return response()->json($cachedData);
     }
 
+
+
     // public function update(ClientRequest $request){
     //     try {
     //         $validatedData = $request->validated();

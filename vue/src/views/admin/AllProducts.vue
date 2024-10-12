@@ -39,14 +39,14 @@
 
                 </Column>
 
-                <Column field="category" header="الفئة" class="border-b-[1px] text-center">
+                <Column field="category" header="الفئة" class="border-b-[1px] text-center" sortable>
                     <template #body="{ data }">
                         <span> {{ data.category.category_name }}</span>
                     </template>
                 </Column>
                 <Column field="stock_quantity" header="الكمية" class="border-b-[1px] text-center" sortable>
                     <template #body="{ data }">
-                        <span> {{ common.formatNumber(data.stock_quantity) }} Pcs</span>
+                        <span> {{ common.formatNumber(data.stock_quantity) }} <span class="text-red-500">Pcs</span></span>
                     </template>
                 </Column>
 
@@ -84,12 +84,12 @@
                         <Skeleton></Skeleton>
                     </template>
                 </Column>
-                <Column field="" header=" الفئة" sortable class="text-center border-b-2">
+                <Column field="" header=" الفئة"  class="text-center border-b-2" sortable>
                     <template #body>
                         <Skeleton></Skeleton>
                     </template>
                 </Column>
-                <Column field="" header="الكمية" class="text-center border-b-2">
+                <Column field="" header="الكمية" class="text-center border-b-2" sortable>
                     <template #body>
                         <Skeleton></Skeleton>
                     </template>
@@ -148,7 +148,8 @@ function filterTable(event) {
     if (!filter) filteredProducts.value = products.value;
     else
         filteredProducts.value = products.value.filter(
-            (p) => p.name.toLowerCase().includes(filter)
+            (p) => p.name.toLowerCase().includes(filter) ||
+            p.category.category_name.toLowerCase().includes(filter)
         );
 }
 

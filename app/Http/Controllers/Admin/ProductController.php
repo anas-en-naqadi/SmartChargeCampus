@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ProductRequest;
+use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use App\Models\User;
 
@@ -43,14 +44,17 @@ class ProductController extends Controller
     {
         $validatedData = $request->validated();
         cleanInputs($validatedData);
-
+        if (empty($validatedData['expiration_date'])) {
+            $validatedData['expiration_date'] = null;
+        }
         if (isset($validatedData['image'])) {
             $validatedData['image'] = storeImage($validatedData['image']);
         }
         $validatedData['user_id'] = getSimpleUser()?->id;
-        Product::create($validatedData);
+        $product =   Product::create($validatedData);
         Redis::del('products');
-        return response()->json(['message' => 'تمت إضافة المنتج بنجاح']);    }
+        return response()->json(['message' => 'تمت إضافة المنتج بنجاح', 'product' => ProductResource::make($product)]);
+    }
 
     public function update(ProductRequest $request, Product $product)
     {
@@ -70,15 +74,15 @@ class ProductController extends Controller
         // Update the product
         $product->update($validatedData);
         Redis::del('products');
-        return response()->json(['message' => 'تم تحديث المنتج بنجاح']);    }
+        return response()->json(['message' => 'تم تحديث المنتج بنجاح', 'product' => ProductResource::make($product)]);
+    }
 
     public function show($id)
     {
         try {
 
             $product = Product::with('category')->findOrFail($id);
-         if(!empty($product->image))   $product->image = URL::to($product->image);
-            return response()->json($product);
+            return response()->json(ProductResource::make($product));
         } catch (ModelNotFoundException $exception) {
             return response()->json(['message' => 'Product not found'], 404);
         }
@@ -94,9 +98,8 @@ class ProductController extends Controller
             }
             Redis::del('products');
             return response()->json(['message' => 'تم حذف المنتج بنجاح']);
-                } catch (ModelNotFoundException $exception) {
+        } catch (ModelNotFoundException $exception) {
             return response()->json(['message' => 'product not found'], 404);
         }
     }
-
 }

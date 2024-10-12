@@ -7,7 +7,7 @@ const routes = [
         path: "/login",
         name: "login",
         meta: {
-            title: "Login - ALMOBARKA",
+            title: "Login - MAHALI",
         },
         component: () => import("@/views/auth/Login.vue"),
     },
@@ -15,7 +15,7 @@ const routes = [
         path: "/register",
         name: "register",
         meta: {
-            title: "Register - ALMOBARKA",
+            title: "Register - MAHALI",
         },
         component: () => import("@/views/auth/Register.vue"),
     },

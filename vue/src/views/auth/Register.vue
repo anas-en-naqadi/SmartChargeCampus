@@ -1,8 +1,9 @@
 <template>
+    <main class="w-full h-full py-[5rem]">
     <div
-        class="flex  shadow-md mb-[5rem] mt-[1.5rem] bg-white border border-gray-200 lg:w-[40%] md:w-[40%] sm:w-[40%] w-[80%] xl:w-[30%] mx-auto rounded-md min-h-full flex-col justify-center px-6 py-12 lg:px-8">
+        class="flex  shadow-md mb-[5rem] bg-opacity-80 mt-[1.5rem] bg-white border border-gray-200 lg:w-[40%] md:w-[40%] sm:w-[40%] w-[80%] xl:w-[30%] mx-auto rounded-md min-h-full flex-col justify-center px-6 py-12 lg:px-8">
         <div class="sm:mx-auto sm:w-full sm:max-w-sm sm:max-h-sm -mt-12">
-            <img class="mx-auto h-32 w-32 -mb-10" src="@/assets/images/mahali.PNG" alt="Your Company" />
+            <img class="mx-auto h-32 w-32 rounded-md mt-5 -mb-10" src="@/assets/images/mahali.PNG" alt="Your Company" />
         </div>
 
         <div class=" sm:mx-auto sm:w-full sm:max-w-sm">
@@ -79,16 +80,15 @@
             </form>
         </div>
     </div>
+    </main>
 </template>
 <style scoped>
-/* Custom CSS for background */
-body {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%2300B38F' fill-opacity='0.7' d='M0,128L34.3,154.7C68.6,181,137,235,206,245.3C274.3,256,343,224,411,224C480,224,549,256,617,272C685.7,288,754,288,823,277.3C891.4,267,960,245,1029,218.7C1097.1,192,1166,160,1234,128C1302.9,96,1371,64,1406,48L1440,32L1440,320L1405.7,320C1371.4,320,1303,320,1234,320C1165.7,320,1097,320,1029,320C960,320,891,320,823,320C754.3,320,686,320,617,320C548.6,320,480,320,411,320C342.9,320,274,320,206,320C137.1,320,69,320,34,320L0,320Z'%3E%3C/path%3E%3C/svg%3E");
-    /* Other background properties */
-    background-size: cover;
-    /* Adjust as needed */
-    background-position: bottom;
-    /* Adjust as needed */
+main {
+    width:100%;
+    height:100%;
+  background-image: url("../../assets/images/mahali_background.jpeg");
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 </style>
 <script setup>

@@ -8,7 +8,6 @@ use Stevebauman\Purify\Facades\Purify;
 use Illuminate\Support\Str;
 
 use Illuminate\Support\Facades\Redis;
-use Spatie\Activitylog\Models\Activity;
 use Spatie\LaravelImageOptimizer\Facades\ImageOptimizer;
 
 function getSimpleUser()
@@ -30,22 +29,24 @@ function getCachedData($cacheKey, $callback)
 function saveActivity(Model $subject, $description = '', $action = '')
 {
     Redis::del("activities");
+
     $user = getSimpleUser();
+
     $ipAddress = request()->ip();
+
+    // Log the activity
     activity()
-        ->log($description)
-        ->performedOn($subject)
-        ->subjectId($subject->id)
-        ->causedBy($user)
-        ->causerId($user?->id) // Handle case when causer is null
-        ->logName($action)
-        ->withProperties([
-            'ip' => $ipAddress,  // Store the IP address in the properties field
+        ->log($description)                   // Description of the action
+        ->performedOn($subject)               // The model on which the action is performed
+        ->causedBy($user)                     // The user who caused the action
+        ->logName($action)                    // The type of action (log name)
+        ->withProperties([                    // Additional properties (like IP address)
+            'ip' => $ipAddress,
         ])
-        ->save(); // Save the activity
-    info($ipAddress);
+        ->save();                             // Save the activity
 
 }
+
 
 function storeImage($image)
 {

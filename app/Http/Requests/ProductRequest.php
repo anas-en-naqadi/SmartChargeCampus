@@ -28,7 +28,7 @@ class ProductRequest extends FormRequest
             'stock_quantity' => 'numeric|required',
             'image' => 'required|string', // Fixed image validation rules
             'category_id' => 'numeric|required',
-            'expiration_date' => 'date|required'
+            'expiration_date' => 'nullable|date'
         ];
     }
 
@@ -43,9 +43,8 @@ class ProductRequest extends FormRequest
             'purchase_price.required' => 'سعر الشراء مطلوب',
             'stock_quantity.required' => 'كمية المخزون مطلوبة',
             'image.required' => 'الصورة مطلوبة',
-
+ 'name.unique' => 'الاسم موجود بالفعل في قاعدة البيانات.',
             'category_id.required' => ' الفئة مطلوبة',
-            'expiration_date.required' => 'تاريخ انتهاء الصلاحية مطلوب',
         ];
     }
 }

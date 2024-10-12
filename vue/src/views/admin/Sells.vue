@@ -47,10 +47,8 @@
                 </template>
                 <template #empty>.لا توجد مبيعات</template>
                 <!-- Columns -->
-                <Column field="client" class="border-b-[1px] text-center" header="اسم الزبون">
-                    <template #body={data}>
-                        <span>{{ data.client.name }}</span>
-                    </template>
+                <Column field="client_name" class="border-b-[1px] text-center" header="اسم الزبون">
+
                 </Column>
 
                 <Column field="total_price" class="border-b-[1px] text-center" header="مجموع الحساب" sortable>
@@ -59,7 +57,7 @@
                     </template>
                 </Column>
 
-                <Column field="paid_amount" class="border-b-[1px] text-center" header="الدفع">
+                <Column field="paid_amount" class="border-b-[1px] text-center" header="الدفع" sortable>
                     <template #body="{ data }">
                         <span>{{ common.formatNumber(data.paid_amount) }} درهم</span>
                     </template>
@@ -126,39 +124,39 @@
                 </template>
 
 
-                <Column field="client" class="border-b-[1px] text-center" header="اسم الزبون">
+                <Column field="" class="border-b-[1px] text-center" header="اسم الزبون">
                     <template #body>
                         <Skeleton></Skeleton>
                     </template>
                 </Column>
 
-                <Column field="total_price" class="border-b-[1px] text-center" header="مجموع الحساب" sortable>
+                <Column field="" class="border-b-[1px] text-center" header="مجموع الحساب" sortable>
                     <template #body>
                         <Skeleton></Skeleton>
                     </template>
                 </Column>
 
-                <Column field="paid_amount" class="border-b-[1px] text-center" header="الدفع">
+                <Column field="" class="border-b-[1px] text-center" header="الدفع" sortable>
                     <template #body>
                         <Skeleton></Skeleton>
                     </template>
                 </Column>
-                <Column field="remaining_amount" class="border-b-[1px] text-center" header="الدين" sortable>
+                <Column field="" class="border-b-[1px] text-center" header="الدين" sortable>
                     <template #body>
                         <Skeleton></Skeleton>
                     </template>
                 </Column>
-                <Column field="status" class="border-b-[1px] text-center" header="الحالة" sortable>
+                <Column field="" class="border-b-[1px] text-center" header="الحالة" sortable>
                     <template #body>
                         <Skeleton></Skeleton>
                     </template>
                 </Column>
-                <Column field="check" class="border-b-[1px] text-center" header="الشيك" sortable>
+                <Column field="" class="border-b-[1px] text-center" header="الشيك" sortable>
                     <template #body>
                         <Skeleton></Skeleton>
                     </template>
                 </Column>
-                <Column field="check" class="border-b-[1px] text-center" header="تاريخ دفع الشيك" sortable>
+                <Column field="" class="border-b-[1px] text-center" header="تاريخ دفع الشيك" sortable>
                     <template #body>
                         <Skeleton></Skeleton>
                     </template>
@@ -180,17 +178,16 @@ const loading = ref(true);
 const filteredSells = ref([]);
 const date = ref({start_date:null,end_date:null});
 const toast = useToast();
-import axiosClient from "../../../axios";
-const response = axiosClient.get("/pdf-invoice");
 onMounted(() => {
     fetchSells();
 });
 function filterSells() {
-    store.dispatch("filterByDates", { date: date.value, type: "sell" }).then((res) => {
+    document.body.style.cursor = 'wait'
+    store.dispatch("filterByDates",  date.value ).then((res) => {
         if (res.status === 200 && res.data)
             filteredSells.value = [...res.data];
        common.showValidationErrors(res,toast);
-    }).catch(error => error);
+    }).catch(error => error).finally(()=>document.body.style.cursor = 'default');
 }
 function fetchSells() {
     store
@@ -199,7 +196,6 @@ function fetchSells() {
 
             sells.value = res;
             filteredSells.value = [...res];
-            console.log(filteredSells.value)
 
         })
         .catch((error) => error)
@@ -219,7 +215,7 @@ function filterTable(event) {
     else
         filteredSells.value = sells.value.filter(
             (s) =>
-                s.client.name.toLowerCase().includes(filter)
+                s.client_name.toLowerCase().includes(filter)
 
         );
 }

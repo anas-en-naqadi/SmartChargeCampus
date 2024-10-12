@@ -46,34 +46,13 @@ class DashboardController extends Controller
 
 
 
-    public function monthlyUserRegistrations()
-    {
-        $cacheKey = 'monthly_user_registration';
-        $cacheData = getCachedData($cacheKey, function () {
-        $currentYear = Carbon::now()->year;
 
-        $userRegistrations = User::whereYear('created_at', $currentYear)
-            ->selectRaw('MONTHNAME(created_at) as month_name, COUNT(*) as user_count')
-            ->groupByRaw('MONTHNAME(created_at)')
-            ->orderByRaw('MONTH(created_at)')
-            ->get();
-
-        $labels = $userRegistrations->pluck('month_name')->toArray();
-        $data = $userRegistrations->pluck('user_count')->toArray();
-
-       return[
-            'labels' => $labels,
-            'data' => $data,
-        ];
-    });
-    return response()->json($cacheData);
-    }
     public function getStockByCategory()
     {
         $cacheKey = 'stock_by_category';
         $cacheData = getCachedData($cacheKey, function () {
         $stockAndProductCountByCategory = Product::join('categories', 'products.category_id', '=', 'categories.id')
-            ->select(DB::raw('categories.category_name as category_name, SUM(products.quantity) as total_stock, COUNT(products.id) as product_count'))
+            ->select(DB::raw('categories.category_name as category_name, SUM(products.stock_quantity) as total_stock, COUNT(products.id) as product_count'))
             ->groupBy('categories.category_name')
             ->get();
 
@@ -89,236 +68,324 @@ class DashboardController extends Controller
             'labels' => $labels,
             'datasets' => [
                 [
-                    'label' => 'Total Stock',
+                    'label' => 'إجمالي المخزون',
                     'backgroundColor' => $backgroundColor1,
                     'data' => $totalStock,
                 ],
                 [
-                    'label' => 'Product Count',
+                    'label' => 'عدد المنتجات',
                     'backgroundColor' => $backgroundColor2,
                     'data' => $productCount,
                 ],
+
             ],
         ];
     });
     return response()->json($cacheData);
     }
 
-    public function getMonthlySales()
-{
-    $cacheKey = 'monthly_sales';
-    $cacheData = getCachedData($cacheKey, function () {
-        // Get the first and last day of the current month
-        $firstDayOfMonth = Carbon::now()->startOfMonth()->toDateString();
-        $lastDayOfMonth = Carbon::now()->endOfMonth()->toDateString();
+//     public function getMonthlySales()
+// {
+//     $cacheKey = 'monthly_sales';
+//     $cacheData = getCachedData($cacheKey, function () {
+//         // Get the first and last day of the current month
+//         $firstDayOfMonth = Carbon::now()->startOfMonth()->toDateString();
+//         $lastDayOfMonth = Carbon::now()->endOfMonth()->toDateString();
 
-        // Query to retrieve daily sales data for the current month
-        $dailySales = Sell::whereBetween('created_at', [$firstDayOfMonth, $lastDayOfMonth])
-            ->selectRaw('DATE(created_at) as date, SUM(total_amount) as total_sales')
-            ->groupBy('date')
-            ->orderBy('date')
-            ->get();
+//         // Query to retrieve daily sales data for the current month
+//         $dailySales = Sell::whereBetween('created_at', [$firstDayOfMonth, $lastDayOfMonth])
+//             ->selectRaw('DATE(created_at) as date, SUM(total_price) as total_sales')
+//             ->groupBy('date')
+//             ->orderBy('date')
+//             ->get();
 
-        // Prepare the response data
-        $labels = $dailySales->map(function ($sale) {
-            return Carbon::parse($sale->date)->format('d/M'); // Format 'date' to get day/month
-        })->toArray();
-        $data = $dailySales->pluck('total_sales')->toArray(); // Sales amount for each day
+//         // Prepare the response data
+//         $labels = $dailySales->map(function ($sale) {
+//             return Carbon::parse($sale->date)->format('d/M'); // Format 'date' to get day/month
+//         })->toArray();
+//         $data = $dailySales->pluck('total_sales')->toArray(); // Sales amount for each day
 
-        return [
-            'labels' => $labels,
-            'data' => $data,
-            'colors' => Self::colors,         // Assuming Self::colors is defined somewhere with your color array
-            'borderColors' => Self::borderColors // Assuming Self::borderColors is defined somewhere with your border color array
-        ];
-    });
+//         return [
+//             'labels' => $labels,
+//             'data' => $data,
+//             'colors' => Self::colors,         // Assuming Self::colors is defined somewhere with your color array
+//             'borderColors' => Self::borderColors // Assuming Self::borderColors is defined somewhere with your border color array
+//         ];
+//     });
 
-    return response()->json($cacheData);
-}
-
-    public function orderStatusPieChart()
-    {
-        $cacheKey = 'order_status';
-        $cacheData = getCachedData($cacheKey, function () {
-        // Retrieve counts of orders with different statuses
-        $returnedCount = Order::where('status', 'returned')->count();
-        $confirmedCount = Order::where('status', 'confirmed')->count();
-        $canceledCount = Order::where('status', 'canceled')->count();
-        $processedCount = Order::where('status', 'pending')->count();
+//     return response()->json($cacheData);
+// }
 
 
-        // Calculate total number of orders
-        $totalCount = $returnedCount + $confirmedCount + $canceledCount + $processedCount;
-
-        if ($totalCount > 0) {
-            // Calculate percentage for each status
-            $returnedPercentage = $returnedCount / $totalCount * 100;
-            $confirmedPercentage = $confirmedCount / $totalCount * 100;
-            $canceledPercentage = $canceledCount / $totalCount * 100;
-            $processedPercentage = $processedCount / $totalCount * 100;
-
-        } else {
-            // Set percentages to 0 if there are no orders
-            $returnedPercentage = 0.1;
-            $confirmedPercentage = 0.1;
-            $canceledPercentage = 0.1;
-            $processedPercentage = 0.1;
-        }
-
-        // Prepare data for the pie chart
-        $labels = ['Returned', 'Confirmed', 'Canceled','Pending'];
-        $data = [$returnedPercentage, $confirmedPercentage, $canceledPercentage,$processedPercentage];
-
-        $colorsStatus = [
-            'rgba(255, 99, 132, 0.4)',
-            'rgba(75, 192, 192, 0.8)',
-            'rgba(54, 162, 235, 0.8)',
-                     'rgba(50, 205, 50, 0.2)'
-        ]; // Red, Green, Blue
-
-        // Return the data
-        return ['labels' => $labels, 'data' => $data, 'backgroundColor' => $colorsStatus];
-    });
-    return response()->json($cacheData);
-    }
     public function dashboardData()
     {
         $cacheKey = 'dashboard_data';
         $cacheData = getCachedData($cacheKey, function () {
-        $todayMoney = Order::whereDate('created_at', today())->sum('amount');
-        $todaysUsers = User::whereDate('created_at', today())->count();
-        $newClients = Order::whereDate('created_at', today())->distinct()->count('user_id');
-        $todaysSalesAmount =  Sell::whereBetween('created_at', [today()->startOfMonth(), today()->endOfMonth()])->sum('total_amount');
-        $thisWeekSalesAmount = Sell::whereBetween('created_at', [today()->startOfWeek(), today()->endOfWeek()])->sum('total_amount');
-        // Retrieve data from the previous period (e.g., yesterday)
-        $yesterdayMoney = Order::whereDate('created_at', today()->subDay())->sum('amount');
-        // Retrieve the number of users created on the same day of the previous month
-        $previousMonthUsers = User::whereDate('created_at', today()->subMonth()->startOfMonth())->count();
-        $previousWeekSalesAmount = Sell::whereBetween('created_at', [today()->startOfWeek()->subWeek(), today()->endOfWeek()->subWeek()])->sum('total_amount');
+            // Calculate total revenue for today from all sales
+            $todayMoney = Sell::whereDate('created_at', today())
+                ->with('products')
+                ->get()
+                ->sum(function ($sell) {
+                    return $sell->products->sum(function ($product) {
+                        $profit = $product->selling_price - $product->purchase_price;
+                        return $profit * $product->pivot->quantity;
+                    });
+                });
 
-        $yesterdayNewClients = Order::whereDate('created_at', today()->subDay())->distinct()->count('user_id');
-        $yesterdaySalesAmount = Sell::whereDate('created_at', today()->subDay())->sum('total_amount');
+            // Calculate values for today
+            $todaySales = Sell::whereDate('created_at', today())->sum('total_price');
+            $todayOwn = Sell::whereDate('created_at', today())->sum('remaining_amount');
+            $monthSales = Sell::whereBetween('created_at', [today()->startOfMonth(), today()->endOfMonth()])->sum('total_price');
 
-        // Calculate the changes
-        $salesWeekChange = $thisWeekSalesAmount != 0 ? (($thisWeekSalesAmount - $previousWeekSalesAmount) / $thisWeekSalesAmount) * 100 : 0;
+            // Calculate values for yesterday
+            $yesterdayMoney = Sell::whereDate('created_at', today()->subDay())
+                ->with('products')
+                ->get()
+                ->sum(function ($sell) {
+                    return $sell->products->sum(function ($product) {
+                        $profit = $product->selling_price - $product->purchase_price;
+                        return $profit * $product->pivot->quantity;
+                    });
+                });
 
+            $yesterdaySales = Sell::whereDate('created_at', today()->subDay())->sum('total_price');
+            $yesterdayOwn = Sell::whereDate('created_at', today()->subDay())->sum('remaining_amount');
+            $previousMonthSales = Sell::whereBetween('created_at', [today()->subMonth()->startOfMonth(), today()->subMonth()->endOfMonth()])->sum('total_price');
 
-        $moneyChange = $todayMoney != 0 ? (($todayMoney - $yesterdayMoney) / $todayMoney) * 100 : 0;
-        $usersChange = $todaysUsers != 0 ? (($todaysUsers - $previousMonthUsers) / $todaysUsers) * 100 : 0;
-        $newClientsChange = $newClients != 0 ? (($newClients - $yesterdayNewClients) / $newClients) * 100 : 0;
-        $salesAmountChange = $todaysSalesAmount != 0 ? (($todaysSalesAmount - $yesterdaySalesAmount) / $todaysSalesAmount) * 100 : 0;
+            // Calculate values for the current and previous week
+            $currentWeekSales = Sell::whereBetween('created_at', [today()->startOfWeek(), today()->endOfWeek()])->sum('total_price');
+            $previousWeekSales = Sell::whereBetween('created_at', [today()->subWeek()->startOfWeek(), today()->subWeek()->endOfWeek()])->sum('total_price');
 
-        // Ensure the changes are within the range of -100 to 100
-        $moneyChange = number_format(min(100, max(-100, $moneyChange)), 1);
-        $usersChange = number_format(min(100, max(-100, $usersChange)), 1);
-        $newClientsChange = number_format(min(100, max(-100, $newClientsChange)), 1);
-        $salesAmountChange = number_format(min(100, max(-100, $salesAmountChange)), 1);
-        $salesWeekChange = number_format(min(100, max(-100, $salesWeekChange)), 1);
-        // Return the data with changes
-        return [
-            'todayMoney' => $todayMoney,
-            'moneyChange' => $moneyChange,
-            'todaysUsers' => $todaysUsers,
-            'usersChange' => $usersChange,
-            'newClients' => $newClients,
-            'newClientsChange' => $newClientsChange,
-            'todaysSalesAmount' => $todaysSalesAmount,
-            'salesAmountChange' => $salesAmountChange,
-            'thisWeekSalesAmount' => $thisWeekSalesAmount,
-            'salesWeekChange' => $salesWeekChange,
-        ];
-    });
-    return response()->json($cacheData);
+            // Calculate changes compared to yesterday
+            $todaySalesChange = $todaySales - $yesterdaySales;
+            $moneyChange = $todayMoney - $yesterdayMoney;
+            $ownChange = $todayOwn - $yesterdayOwn;
+
+            // Calculate the monthly and weekly changes
+            $monthSalesChange = $monthSales - $previousMonthSales;
+            $weekSalesChange = $currentWeekSales - $previousWeekSales;
+
+            // Calculate percentage changes
+            $salesPercentageChange = $yesterdaySales ? ($todaySalesChange / $yesterdaySales) * 100 : 0; // Avoid division by zero
+            $moneyPercentageChange = $yesterdayMoney ? ($moneyChange / $yesterdayMoney) * 100 : 0; // Avoid division by zero
+            $ownPercentageChange = $yesterdayOwn ? ($ownChange / $yesterdayOwn) * 100 : 0; // Avoid division by zero
+            $monthSalesPercentageChange = $previousMonthSales ? ($monthSalesChange / $previousMonthSales) * 100 : 0; // Avoid division by zero
+            $weekSalesPercentageChange = $previousWeekSales ? ($weekSalesChange / $previousWeekSales) * 100 : 0; // Avoid division by zero
+
+            // Return the data with changes
+            return [
+                'todayMoney' => $todayMoney,
+                'todaySales' => $todaySales,
+                'todayOwn' => $todayOwn,
+                'monthSales' => $monthSales,
+                'thisWeekSalesAmount' => $currentWeekSales, // Added weekly sales
+
+                // Adding percentage change values
+                'salesPercentageChange' => $salesPercentageChange,
+                'moneyPercentageChange' => $moneyPercentageChange,
+                'ownPercentageChange' => $ownPercentageChange,
+                'monthSalesPercentageChange' => $monthSalesPercentageChange,
+                'salesWeekChange' => $weekSalesPercentageChange, // Added weekly sales percentage change
+            ];
+        });
+
+        return response()->json($cacheData);
     }
+
+
+
+
+
     public function weeklySalesChart()
     {
         $cacheKey = 'weekly_sales';
         $cacheData = getCachedData($cacheKey, function () {
-        // Get the current week's start and end dates
-        $startOfWeek = Carbon::now()->startOfWeek();
-        $endOfWeek = Carbon::now()->endOfWeek();
+            // Get the current week's start and end dates
+            $startOfWeek = Carbon::now()->startOfWeek();
+            $endOfWeek = Carbon::now()->endOfWeek();
 
-        // Query the database to get weekly sales data
-        $weeklySales = Sell::whereBetween('created_at', [$startOfWeek, $endOfWeek])
-            ->selectRaw('DAYNAME(created_at) as day_name, SUM(total_amount) as total_sales')
-            ->groupBy('day_name')
-            ->orderByRaw('FIELD(day_name, "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")')
-            ->get();
+            // Query the database to get weekly sales data
+            $weeklySales = Sell::whereBetween('created_at', [$startOfWeek, $endOfWeek])
+                ->selectRaw('DAYNAME(created_at) as day_name, SUM(total_price) as total_sales')
+                ->groupBy('day_name')
+                ->orderByRaw('FIELD(day_name, "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")')
+                ->get();
 
-        // Initialize sales data for all seven days to 0
-        $salesData = [
-            'Monday' => 0,
-            'Tuesday' => 0,
-            'Wednesday' => 0,
-            'Thursday' => 0,
-            'Friday' => 0,
-            'Saturday' => 0,
-            'Sunday' => 0,
-        ];
+            // Initialize sales data for all seven days to 0
+            $salesData = [
+                'Monday' => 0,
+                'Tuesday' => 0,
+                'Wednesday' => 0,
+                'Thursday' => 0,
+                'Friday' => 0,
+                'Saturday' => 0,
+                'Sunday' => 0,
+            ];
 
+            // Fill in the actual sales data for days where sales exist
+            foreach ($weeklySales as $sale) {
+                $salesData[$sale->day_name] = $sale->total_sales;
+            }
 
+            // Arabic translation for days of the week
+            $arabicDays = [
+                'Monday' => 'الاثنين',
+                'Tuesday' => 'الثلاثاء',
+                'Wednesday' => 'الأربعاء',
+                'Thursday' => 'الخميس',
+                'Friday' => 'الجمعة',
+                'Saturday' => 'السبت',
+                'Sunday' => 'الأحد',
+            ];
 
-        // Fill in the actual sales data for days where sales exist
-        foreach ($weeklySales as $sale) {
-            $salesData[$sale->day_name] = $sale->total_sales;
-        }
+            // Map the labels to Arabic
+            $labels = array_map(function($day) use ($arabicDays) {
+                return $arabicDays[$day];
+            }, array_keys($salesData));
 
-        // Format the data for chart.js
-        $labels = array_keys($salesData);
-        $data = array_values($salesData);
+            $data = array_values($salesData);
 
-        return ['labels' => $labels, 'data' => $data, 'colors' => Self::colors, 'borderColors' => Self::borderColors];
-    });
-    return response()->json($cacheData);
+            return ['labels' => $labels, 'data' => $data, 'colors' => Self::colors, 'borderColors' => Self::borderColors];
+        });
+
+        return response()->json($cacheData);
     }
 
 
 
 
 
-    function monthlySalesChart()
+
+    public function monthlySalesChart()
     {
         $cacheKey = 'monthly_sales_Chart';
         $cacheData = getCachedData($cacheKey, function () {
-        // Get the current year
-        $currentYear = Carbon::now()->year;
+            // Get the current year
+            $currentYear = Carbon::now()->year;
 
-        // Query the database to get monthly sales data for the current year
-        $monthlySales = Sell::whereYear('created_at', $currentYear)
-            ->selectRaw('MONTHNAME(created_at) as month_name, SUM(total_amount) as total_sales')
-            ->groupByRaw('MONTHNAME(created_at)')
-            ->orderByRaw('MONTH(created_at)')
-            ->get();
+            // Query the database to get monthly sales data for the current year
+            $monthlySales = Sell::whereYear('created_at', $currentYear)
+                ->selectRaw('MONTHNAME(created_at) as month_name, SUM(total_price) as total_sales')
+                ->groupByRaw('MONTHNAME(created_at)')
+                ->orderByRaw('MONTH(created_at)')
+                ->get();
 
-        // Initialize sales data for all twelve months to 0
-        $salesData = [
-            'January' => 0,
-            'February' => 0,
-            'March' => 0,
-            'April' => 0,
-            'May' => 0,
-            'June' => 0,
-            'July' => 0,
-            'August' => 0,
-            'September' => 0,
-            'October' => 0,
-            'November' => 0,
-            'December' => 0,
-        ];
+            // Initialize sales data for all twelve months to 0
+            $salesData = [
+                'January' => 0,
+                'February' => 0,
+                'March' => 0,
+                'April' => 0,
+                'May' => 0,
+                'June' => 0,
+                'July' => 0,
+                'August' => 0,
+                'September' => 0,
+                'October' => 0,
+                'November' => 0,
+                'December' => 0,
+            ];
 
+            // Fill in the actual sales data for months where sales exist
+            foreach ($monthlySales as $sale) {
+                $salesData[$sale->month_name] = $sale->total_sales;
+            }
 
-        // Fill in the actual sales data for months where sales exist
-        foreach ($monthlySales as $sale) {
-            $salesData[$sale->month_name] = $sale->total_sales;
-        }
+            // Arabic translation for months of the year
+            $arabicMonths = [
+                'January' => 'يناير',
+                'February' => 'فبراير',
+                'March' => 'مارس',
+                'April' => 'أبريل',
+                'May' => 'مايو',
+                'June' => 'يونيو',
+                'July' => 'يوليو',
+                'August' => 'أغسطس',
+                'September' => 'سبتمبر',
+                'October' => 'أكتوبر',
+                'November' => 'نوفمبر',
+                'December' => 'ديسمبر',
+            ];
 
-        // Format the data for chart.js
-        $labels = array_keys($salesData);
-        $data = array_values($salesData);
+            // Map the labels to Arabic
+            $labels = array_map(function($month) use ($arabicMonths) {
+                return $arabicMonths[$month];
+            }, array_keys($salesData));
 
+            $data = array_values($salesData);
 
-      return ['labels' => $labels, 'data' => $data, 'colors' => Self::colors, 'borderColors' => Self::borderColors];
-    });
-    return response()->json($cacheData);
+            return ['labels' => $labels, 'data' => $data, 'colors' => Self::colors, 'borderColors' => Self::borderColors];
+        });
+
+        return response()->json($cacheData);
     }
+
+    public function monthlyRemaining()
+    {
+        $cacheKey = 'monthly_remaining_amount';
+        $cacheData = getCachedData($cacheKey, function () {
+            // Get the current year
+            $currentYear = Carbon::now()->year;
+
+            // Query the database to get monthly sales data for the current year
+            $monthlySales = Sell::whereYear('created_at', $currentYear)
+                ->selectRaw('MONTHNAME(created_at) as month_name, SUM(remaining_amount) as total_sales')
+                ->groupByRaw('MONTHNAME(created_at)')
+                ->orderByRaw('MONTH(created_at)')
+                ->get();
+
+            // Initialize sales data for all twelve months to 0
+            $salesData = [
+                'January' => 0,
+                'February' => 0,
+                'March' => 0,
+                'April' => 0,
+                'May' => 0,
+                'June' => 0,
+                'July' => 0,
+                'August' => 0,
+                'September' => 0,
+                'October' => 0,
+                'November' => 0,
+                'December' => 0,
+            ];
+
+            // Fill in the actual sales data for months where sales exist
+            foreach ($monthlySales as $sale) {
+                $salesData[$sale->month_name] = $sale->total_sales;
+            }
+
+            // Arabic translation for months of the year
+            $arabicMonths = [
+                'January' => 'يناير',
+                'February' => 'فبراير',
+                'March' => 'مارس',
+                'April' => 'أبريل',
+                'May' => 'مايو',
+                'June' => 'يونيو',
+                'July' => 'يوليو',
+                'August' => 'أغسطس',
+                'September' => 'سبتمبر',
+                'October' => 'أكتوبر',
+                'November' => 'نوفمبر',
+                'December' => 'ديسمبر',
+            ];
+
+            // Map the labels to Arabic
+            $labels = array_map(function($month) use ($arabicMonths) {
+                return $arabicMonths[$month];
+            }, array_keys($salesData));
+
+            $data = array_values($salesData);
+
+            return ['labels' => $labels, 'data' => $data, 'colors' => Self::colors, 'borderColors' => Self::borderColors];
+        });
+
+        return response()->json($cacheData);
+    }
+    public function latestSells(){
+        $sells = Sell::latest()->limit(8)->get();
+        return response()->json($sells);
 }
+}
+

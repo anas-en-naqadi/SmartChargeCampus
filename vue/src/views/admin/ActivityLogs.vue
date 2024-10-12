@@ -1,7 +1,7 @@
 <template>
     <div class="card mt-12 m-6 bg-white border border-gray-300 rounded-xl">
         <div class="flex justify-between items-center mb-4">
-            <h2 class="mb-3 text-2xl font-extrabold tracking-tight text-gray-900 p-8">
+            <h2 class="mb-3 text-2xl font-extrabold tracking-tight  text-gray-900 p-8">
                 سجلات النشاط
             </h2>
 
@@ -84,7 +84,9 @@
                     </template>
                 </Column>
                 <Column field="description" header="الحدث " class="border-b-[1px] text-center">
-
+                    <template #body>
+                        <Skeleton></Skeleton>
+                    </template>
                 </Column>
                 <Column field="log_name" header=" العملية" class="border-b-[1px] text-center">
                     <template #body>

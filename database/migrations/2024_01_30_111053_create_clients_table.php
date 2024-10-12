@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('clients', function (Blueprint $table) {
             $table->id();
             $table->string("name");
-            $table->string("phone")->unique();
+            $table->string("phone")->unique()->nullable();
             $table->foreignId("user_id")->constrained("users")->onDelete("cascade");
-            $table->string("cni",10)->unique();
+            $table->string("cni",10)->unique()->nullable();
             $table->enum("role",["client","transporter"]);
             $table->unsignedDecimal("total_credit",20,2)->default(0);
             $table->timestamps();

@@ -8,3 +8,36 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Style for WebKit browsers (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+    width: 12px; /* Set width for vertical scrollbar */
+    height: 12px; /* Set height for horizontal scrollbar */
+}
+
+/* Scrollbar track */
+::-webkit-scrollbar-track {
+    background: #f0f0f0; /* Light background for the track */
+    border-radius: 10px; /* Rounded corners for the track */
+}
+
+/* Scrollbar handle (thumb) */
+::-webkit-scrollbar-thumb {
+    background-color: #28a745; /* Green color for the scrollbar thumb */
+    border-radius: 10px; /* Fully rounded thumb */
+    border: 3px solid #f0f0f0; /* Adds padding around the thumb and matches track background */
+    background-clip: padding-box; /* Ensures thumb is inside the border */
+    transition: background-color 0.3s ease; /* Smooth color transition */
+}
+
+/* Hover effect on the scrollbar handle */
+::-webkit-scrollbar-thumb:hover {
+    background-color: #218838; /* Darker green on hover for visibility */
+}
+
+/* Active (clicked) scrollbar handle */
+::-webkit-scrollbar-thumb:active {
+    background-color: #1e7e34; /* Even darker green when actively dragging */
+}
+
+

@@ -1,10 +1,10 @@
 import { createStore } from "vuex";
-import userActions from "./actions/UserActions";
 import adminActions from "./actions/AdminActions";
 
 const store = createStore({
     state: {
         products: {},
+        suppliers: {},
         user: {
             data: {},
             token: sessionStorage.getItem("TOKEN"),
@@ -12,13 +12,16 @@ const store = createStore({
     },
     getters: {},
     actions: {
-      ...adminActions,
-        ...userActions
+        ...adminActions,
     },
     mutations: {
         SET_PRODUCTS(state, products) {
             // Update the products state with the received data
             state.products = products;
+        },
+        SET_SUPPLIER(state, suppliers) {
+            // Update the products state with the received data
+            state.suppliers = suppliers;
         },
         SET_USER(state, user) {
             state.user.data = user;
@@ -27,7 +30,6 @@ const store = createStore({
             sessionStorage.removeItem("TOKEN");
             state.user.data = {};
             state.user.token = null;
-
         },
     },
     modules: {},

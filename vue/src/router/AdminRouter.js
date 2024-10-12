@@ -24,6 +24,14 @@ export default [
                 component: () => import("@/views/admin/Clients.vue"),
             },
             {
+                path: "/admin/suppliers",
+                name: "suppliers",
+                meta: {
+                    title: "Suppliers - Admin",
+                },
+                component: () => import("@/views/admin/Suppliers.vue"),
+            },
+            {
                 path: "/admin/products",
                 name: "products",
                 meta: {
@@ -31,22 +39,8 @@ export default [
                 },
                 component: () => import("@/views/admin/Products.vue"),
             },
-            {
-                path: "/admin/orders",
-                name: "orders",
-                meta: {
-                    title: "Orders - Admin",
-                },
-                component: () => import("@/views/admin/order/Orders.vue"),
-            },
-            {
-                path: "/admin/orders/:id(\\d+)",
-                name: "order-details",
-                meta: {
-                    title: "Order_Details - Admin",
-                },
-                component: () => import("@/views/admin/order/OrderDetails.vue"),
-            },
+
+        
             {
                 path: "/admin/invoices",
                 name: "invoices",

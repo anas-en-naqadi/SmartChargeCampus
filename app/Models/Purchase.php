@@ -10,16 +10,28 @@ class Purchase extends Model
 {
     use HasFactory,SoftDeletes;
 
-    protected $fillable = [
-        'user_id',
-        'product_id',
-        'transporter_id'
-    ];
 
-    public function transporter(){
+    protected $fillable = ['name','user_id','purchase_price','category_id','stock_quantity','expiration_date','transporter_id','updated_product'];
+
+
+    public function transporter()
+    {
         return $this->belongsTo(Client::class);
     }
 
+    public function getTransporterNameAttribute()
+    {
+        return $this->transporter ? $this->transporter->name : null; // Return null if no transporter is assigned
+    }
 
-  
+        public function category(){
+            return $this->belongsTo(Category::class);
+        }
+
+        public function product(){
+            return $this->belongsTo(Product::class,'updated_product');
+        }
+
+
+
 }

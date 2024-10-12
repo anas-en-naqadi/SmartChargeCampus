@@ -20,7 +20,8 @@ class CreateSellsTable extends Migration
             $table->decimal('total_price',20,2)->default(0);
             $table->decimal('paid_amount', 20, 2)->default(0);
             $table->decimal('remaining_amount', 20, 2)->default(0);
-            $table->enum("status", ["مدفوع", "غير مدفوع", "متبقي"]);             $table->boolean("check");
+            $table->enum("status", ["مدفوع", "غير مدفوع", "متبقي"]);
+                     $table->boolean("check");
             $table->date("check_date")->nullable();
             $table->timestamps();
             $table->softDeletes();

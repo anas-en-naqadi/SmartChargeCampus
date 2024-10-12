@@ -131,7 +131,7 @@
 
                 <div class="w-full">
                     <button id="action_button" type="button" @click="addExpense"
-                        class="text-white bg-blue-700 w-full hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm  px-5 py-2.5 text-center">
+                        class="text-white bg-green-600 w-full hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm  px-5 py-2.5 text-center">
                         إضافة
                     </button>
                 </div>
@@ -195,6 +195,8 @@ function deleteExpense(id) {
         })
         .then((result) => {
             if (result.isConfirmed) {
+                document.body.style.cursor = 'wait';
+
                 store
                     .dispatch("destroyExpense", id)
                     .then((res) => {
@@ -204,11 +206,12 @@ function deleteExpense(id) {
                             filteredExpenses.value = filteredExpenses.value.filter(e => e.id !== id);
                             expenses.value = filteredExpenses.value;
                             common.showToast({ title: res.data.message, icon: "success" });
+                            document.body.style.cursor = 'default';
 
                         }
 
                     })
-                    .catch((error) => console.error(error))
+                    .catch((error) => error)
                     .finally(() => {
                         loading.value = false;
                     });

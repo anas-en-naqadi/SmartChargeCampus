@@ -291,7 +291,7 @@
                                                 l'utilisateur
                                                 <span class="text-red-600">{{
                                                     notification.data.name
-                                                    }}</span>
+                                                }}</span>
                                                 a passer une commande avec id: {{ notification.data.order_id }}!!
                                             </div>
                                             <div v-else @click="redirectTo(notification.data.url)"
@@ -299,7 +299,7 @@
                                                 Le stock du produit
                                                 <span class="font-bold text-red-500">{{
                                                     (notification.data.product_name).toUpperCase()
-                                                    }}</span>
+                                                }}</span>
                                                 est actuellement inférieur à 10. Merci de vérifier.
                                             </div>
 
@@ -367,16 +367,27 @@
                                         <span class="ml-3">إحصائيات</span>
                                     </router-link>
                                 </li>
+                                <li>
+                                        <router-link :to="{ name: 'categories' }" :class="{
+                                            'text-white bg-cyan-500': route.name === 'categories',
+                                            'text-base text-gray-900 font-normal rounded-lg hover:bg-gray-100 hover:text-gray-900 group transition duration-75 flex items-center p-2': true
+                                        }">
+                                            <i class="fas fa-th-large"></i>
 
+
+                                            <span class="ml-3"> جميع الفئات</span>
+                                        </router-link>
+                                    </li>
                                 <li>
                                     <router-link :to="{ name: 'purchases' }" :class="{
-    'text-white bg-fuchsia-600': route.name === 'purchases',
+                                        'text-white bg-fuchsia-600': route.name === 'purchases',
                                         'text-base text-gray-900 font-normal rounded-lg hover:bg-gray-100 hover:text-gray-900 group transition duration-75 flex items-center p-2': true
                                     }">
                                         <i class="fas fa-cart-plus"></i>
                                         <span class="ml-3 flex-1 whitespace-nowrap">إضافة المشتريات</span>
                                     </router-link>
                                 </li>
+
                                 <li>
                                     <router-link :to="{ name: 'products' }" :class="{
                                         'text-white bg-orange-600': route.name === 'blacklist',
@@ -388,14 +399,6 @@
                                     </router-link>
                                 </li>
 
-                                <li>
-                                    <router-link :to="{ name: 'admin-all-products' }" :class="{
-    'text-white bg-violet-600': route.name === 'admin-all-products',
-                                        'text-base text-gray-900 font-normal rounded-lg hover:bg-gray-100 hover:text-gray-900 group transition duration-75 flex items-center p-2': true
-                                    }"><i class="fas fa-clipboard-list"></i>
-                                        <span class="ml-3 flex-1 whitespace-nowrap">تقرير المخزون</span>
-                                    </router-link>
-                                </li>
 
                                 <li>
                                     <router-link :to="{ name: 'sells' }" :class="{
@@ -408,7 +411,7 @@
                                 </li>
                                 <li>
                                     <router-link :to="{ name: 'invoices' }" :class="{
-                                        'text-white bg-red-600': route.name === 'invoices',
+                                        'text-white bg-sky-500': route.name === 'invoices',
                                         'text-base text-gray-900 font-normal rounded-lg hover:bg-gray-100 hover:text-gray-900 group transition duration-75 flex items-center p-2': true
                                     }">
                                         <i class="fas fa-plus-square"></i>
@@ -418,32 +421,39 @@
                             </ul>
                             <div class="space-y-2 pt-2">
                                 <ul class="space-y-2 pb-2">
-
                                     <li>
-                                        <router-link :to="{ name: 'categories' }" :class="{
-                                            'text-white bg-yellow-600': route.name === 'categories',
-                                            'text-base text-gray-900 font-normal rounded-lg hover:bg-gray-100 hover:text-gray-900 group transition duration-75 flex items-center p-2': true
-                                        }">
-                                            <i class="fas fa-th-large"></i>
+                                    <router-link :to="{ name: 'admin-all-products' }" :class="{
+                                        'text-white bg-violet-600': route.name === 'admin-all-products',
+                                        'text-base text-gray-900 font-normal rounded-lg hover:bg-gray-100 hover:text-gray-900 group transition duration-75 flex items-center p-2': true
+                                    }"><i class="fas fa-clipboard-list"></i>
+                                        <span class="ml-3 flex-1 whitespace-nowrap">تقرير المخزون</span>
+                                    </router-link>
+                                </li>
 
 
-                                            <span class="ml-3"> جميع الفئات</span>
-                                        </router-link>
-                                    </li>
                                     <li>
                                         <router-link :to="{ name: 'clients' }" :class="{
-                                        'text-white bg-yellow-600': route.name === 'clients',
-                                        'text-base text-gray-900 font-normal rounded-lg hover:bg-gray-100 hover:text-gray-900 group transition duration-75 flex items-center p-2': true
-                                    }">
+                                            'text-white bg-yellow-600': route.name === 'clients',
+                                            'text-base text-gray-900 font-normal rounded-lg hover:bg-gray-100 hover:text-gray-900 group transition duration-75 flex items-center p-2': true
+                                        }">
                                             <i class="fas fa-users"></i>
 
                                             <span class="ml-3">تقارير الزبناء</span>
                                         </router-link>
                                     </li>
+                                    <li>
+                                    <router-link :to="{ name: 'suppliers' }" :class="{
+                                        'text-white bg-pink-500': route.name === 'suppliers',
+                                        'text-base text-gray-900 font-normal rounded-lg hover:bg-gray-100 hover:text-gray-900 group transition duration-75 flex items-center p-2': true
+                                    }">
+<i class="fas fa-file-contract"></i>
+<span class="ml-3 flex-1 whitespace-nowrap">تقارير الموردين </span>
+                                    </router-link>
+                                </li>
 
                                     <li>
                                         <router-link :to="{ name: 'expenses' }" :class="{
-    'text-white bg-yellow-600': route.name === 'expenses',
+                                            'text-white bg-rose-500': route.name === 'expenses',
                                             'text-base text-gray-900 font-normal rounded-lg hover:bg-gray-100 hover:text-gray-900 group transition duration-75 flex items-center p-2': true
                                         }">
                                             <i class="fas fa-money-bill-wave"></i>
@@ -453,7 +463,7 @@
                                     </li>
                                     <li>
                                         <router-link :to="{ name: 'activities' }" :class="{
-                                            'text-white bg-yellow-600': route.name === 'activities',
+                                            'text-white bg-amber-500': route.name === 'activities',
                                             'text-base text-gray-900 font-normal rounded-lg hover:bg-gray-100 hover:text-gray-900 group transition duration-75 flex items-center p-2': true
                                         }">
                                             <i class="fas fa-file-alt"></i>

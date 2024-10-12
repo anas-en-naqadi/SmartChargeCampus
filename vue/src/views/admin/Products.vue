@@ -5,7 +5,7 @@
                 قائمة المنتجات
 
             </h2>
-            <Button @click="visible = true" label="+ منتج جديد"
+            <Button :disabled="!loading" @click="visible = true" label="+ منتج جديد"
                 class="p-button-outlined h-10 bg-white py-2 px-3 mr-6 border border-black rounded-md text-black hover:text-white hover:bg-black" />
         </div>
         <!-- Main Data Table -->
@@ -41,9 +41,9 @@
                 <Column field="name" header="إسم المنتج" class="border-b-[1px] text-center">
 
                 </Column>
-                <Column field="category" header="الفئة" class="border-b-[1px] text-center">
+                <Column field="category" header="الفئة" class="border-b-[1px] text-center" sortable>
                     <template #body="{ data }">
-                        <span> {{ data.category.category_name }}</span>
+                        <span> {{ data.category_name }}</span>
                     </template>
                 </Column>
                 <Column field="stock_quantity" header="الكمية" class="border-b-[1px] text-center" sortable>
@@ -51,18 +51,18 @@
                 </Column>
                 <Column field="purchase_price" header="سعر الشراء" sortable class="border-b-[1px] text-center">
                     <template #body="{ data }">
-                        <span> {{ common.formatNumber(data.purchase_price) }} DH</span>
+                        <span> {{ common.formatNumber(data.purchase_price) }} درهم</span>
                     </template>
                 </Column>
                 <Column class="border-b-[1px] text-center" field="selling_price" sortable header="سعر البيع">
                     <template #body="{ data }">
-                        <span> {{ common.formatNumber(data.selling_price) }} DH</span>
+                        <span> {{ common.formatNumber(data.selling_price) }} درهم</span>
                     </template>
                 </Column>
                 <Column sortable field="expiration_date" class="border-b-[1px] text-center"
                     header="تاريخ انتهاء الصلاحية">
                     <template #body="{ data }">
-                        <span> {{ data.expiration_date ? common.formatDate(data.expiration_date ) : "-" }} </span>
+                        <span> {{ data.expiration_date ? common.formatDate(data.expiration_date) : "-" }} </span>
                     </template>
                 </Column>
                 <Column sortable field="created_at" class="border-b-[1px] text-center" header="تاريخ الإنشاء">
@@ -70,11 +70,7 @@
                         <span> {{ common.formatDate(data.created_at) }} </span>
                     </template>
                 </Column>
-                <Column field="updated_at" class="border-b-[1px] text-center" header="تاريخ التعديل">
-                    <template #body="{ data }">
-                        <span> {{ common.formatDate(data.updated_at) }} </span>
-                    </template>
-                </Column>
+
                 <Column header="إجراءات" class="border-b-[1px] text-center">
                     <template #body="{ data }">
                         <div class="flex gap-3">
@@ -125,7 +121,7 @@
                     </template>
                 </Column>
 
-                <Column field="" header=" الفئة" class="text-center border-b-2">
+                <Column field="" header=" الفئة" class="text-center border-b-2" sortable>
                     <template #body>
                         <Skeleton></Skeleton>
                     </template>
@@ -155,11 +151,7 @@
                         <Skeleton></Skeleton>
                     </template>
                 </Column>
-                <Column field="" class="border-b-[1px] text-center" header="تاريخ التعديل">
-                    <template #body>
-                        <Skeleton></Skeleton>
-                    </template>
-                </Column>
+
                 <Column header="إجراءات" class="border-b-[1px] text-center">
                     <template #body>
                         <Skeleton></Skeleton>
@@ -261,7 +253,8 @@
                         </option>
                     </select>
                 </div>
-                <Buton :loading="loaderButton" :string="product.id ?'تعديل':'إضافة'" @trigger-event="switchActions" color="blue" />
+                <Buton :loading="loaderButton" :string="product.id ? 'تعديل' : 'إضافة'" @trigger-event="switchActions"
+                    :color="'blue'" />
 
 
             </form>
@@ -283,8 +276,7 @@ const loaderButton = ref(false);
 const categories = ref([]);
 const products = computed(() => store.state.products);
 const filteredProducts = ref([]);
-let imageId = 0;
-const images = ref([]);
+const skeletonObjects = new Array(10);
 const product = ref({
     name: "",
     image: "",
@@ -311,28 +303,53 @@ function fetchCategories() {
             loading.value = true;
         });
 }
+function make_changes(res) {
+    visible.value = false;
+    common.showToast({ title: res.data.message, icon: "success" });
+    console.log(res.data.product);
+
+    if (product.value.id) {
+        const index = filteredProducts.value.findIndex((p) => p.id === res.data.product.id);
+        console.log(index);
+        if (index !== -1) {
+            filteredProducts.value[index] = res.data.product;
+        }
+
+    } else
+        filteredProducts.value.push(res.data.product);
+
+    store.commit("SET_PRODUCTS",filteredProducts.value);
+
+
+    filteredProducts.value.sort((a, b) => {
+        return new Date(b.created_at) - new Date(a.created_at);
+    });
+    product.value = {
+
+        category_id: 0,
+
+    };
+}
 function updateProduct() {
 
-    loaderButton.value =false ;
+    loaderButton.value = false;
     store
         .dispatch("updateProduct", {
             product: product.value,
             product_id: product.value.id,
         })
         .then((res) => {
-            if (res.status === 200 && res.data) {
-                loaderButton.value = false;
-                loading.value = true;
+            if (res.status === 200 && res.data)
 
-                common.showToast({ title: res.data.message, icon: "success" });
+                make_changes(res);
+            else
 
-                fetchProducts();
-                product.value = {};
-
-            }
-          common.showValidationErrors(res,toast);
+                common.showValidationErrors(res, toast);
         })
-        .catch((error) => error)
+        .catch((error) => error).finally(() => loaderButton.value = false
+
+
+        );
 
 
 }
@@ -368,20 +385,13 @@ function addProduct() {
         .dispatch("storeProduct", product.value)
         .then((res) => {
 
-            if (res && res.status === 200 && res.data) {
-                loaderButton.value = true ;
-                visible.value = false;
-                common.showToast({ title: res.data.message, icon: "success" });
+            if (res && res.status === 200 && res.data)
+                make_changes(res);
 
-                fetchProducts();
-                product.value = {};
-            }
             else
-           common.showValidationErrors(res,toast);
+                common.showValidationErrors(res, toast);
         })
-        .catch((error) => {
-            common.showToast({ title: error, icon: "error" });
-        })
+        .catch((error) => error).finally(() => loaderButton.value = false);
 
 
 }
@@ -413,7 +423,7 @@ function onChooseImage(event) {
 function fetchProducts() {
     store
         .dispatch("getProducts")
-        .then((res)=>{
+        .then((res) => {
             filteredProducts.value = products.value;
         })
         .catch((error) => console.error(error))
@@ -435,10 +445,13 @@ function deleteProduct(id) {
         })
         .then((result) => {
             if (result.isConfirmed) {
+                document.body.style.cursor = "wait";
                 store.dispatch("destroyProduct", id).then((res) => {
                     if (res) {
                         common.showToast({ title: res.message, icon: "success" });
-                        fetchProducts();
+                        document.body.style.cursor = "default";
+                        filteredProducts.value = filteredProducts.value.filter((p)=>p.id != id);
+
                     }
                 });
             }
@@ -456,34 +469,6 @@ function filterTable(event) {
         );
 }
 
-// Define skeleton data
-const skeletonObjects = new Array(10);
-
-function deleteImage() {
-    if (imageId != 0) {
-        const id = images.value[imageId - 1]?.id;
-         images.value = images.value.filter((image, index) => index !== (imageId - 1));
-        imageId= 0;
-        if(id){
-            store.dispatch("destroyImage", { image_id: id }).then((res) => {
-                console.log("res", res)
-                if (res.status === 200 && res) {
-                    common.showToast({ title: res.data.message, icon: "success" });
-                    imageId = 0;
-                }
-            }).catch((error) => {
-                common.showToast({ title: "Oops, something went wrong !!", icon: "warning" });
-
-            })
-        }else{
-            common.showToast({ title: "Image deleted successfully !!", icon: "success" });
-
-        }
 
 
-    } else {
-        common.showToast({ title: "Please type the order of the image", icon: "warning" });
-
-    }
-}
 </script>

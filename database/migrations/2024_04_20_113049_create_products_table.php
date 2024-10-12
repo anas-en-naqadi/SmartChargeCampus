@@ -20,7 +20,7 @@ return new class extends Migration
 
                 $table->foreignId("category_id")->constrained("categories")->onDelete("cascade");
                 $table->unsignedBigInteger('stock_quantity');
-                $table->date("expiration_date");
+                $table->date("expiration_date")->nullable();
                 $table->string('image'); // New column for image
                 $table->timestamps();
                 $table->softDeletes();

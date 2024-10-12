@@ -4,7 +4,7 @@
             <h2 class="mb-3 text-2xl font-extrabold tracking-tight text-gray-900 p-8">
                 قائمة الفئات
             </h2>
-            <Button @click="visible = true" label="+ فئة جديدة"
+            <Button :disabled="loading" @click="visible = true" label="+ فئة جديدة"
                 class="p-button-outlined h-10 bg-white py-2 px-3 mr-6 border border-black rounded-md text-black hover:text-white hover:bg-black" />
         </div>
 
@@ -70,7 +70,7 @@
                         <span class="relative">
                             <i
                                 class="pi pi-search absolute top-2/4 -mt-2 left-3 text-surface-400 white:text-surface-600" />
-                            <InputText :disabled="loading" placeholder="بحث" class="pl-10 py-2" />
+                            <InputText disabled placeholder="بحث" class="pl-10 py-2" />
                         </span>
                         <Button type="button" icon="pi pi-filter-slash" label="مسح"
                             class="p-button-outlined bg-white py-2 px-4 border border-blue-500 rounded-md text-blue-800 hover:text-white hover:bg-blue-500"
@@ -79,7 +79,7 @@
                 </template>
 
 
-                <Column field="Category_name" header="الفئة">
+                <Column field="" header="الفئة">
                     <template #body>
                         <Skeleton></Skeleton>
                     </template>
@@ -97,7 +97,8 @@
             </DataTable>
         </div>
 
-        <Dialog v-model:visible="visible" modal :header="category.id ? 'تعديل' : 'إضافة' + ' فئة'" class="w-[30%]">
+        <Dialog v-model:visible="visible" modal header="إضافة فئة" class="w-[30%]">
+          <div class="w-ful">
             <div class="relative z-0 w-full mb-5 group">
                 <label for="category_name" class="block mb-2 text-sm font-medium text-gray-500">اسم الفئة</label>
                 <input v-model="category_name" type="text" id="category_name"
@@ -106,11 +107,12 @@
             </div>
 
             <div class="w-full">
-                <button id="action_button" type="button" @click="addCategory"
-                    class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center">
-                    {{ category.id ? "تعديل" : "إضافة" }}
-                </button>
-            </div>
+                    <button id="action_button" type="button" @click="addCategory"
+                        class="text-white bg-green-600 w-full hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm  px-5 py-2.5 text-center">
+                        إضافة
+                    </button>
+                </div>
+          </div>
         </Dialog>
         <Toast />
     </div>
@@ -189,9 +191,11 @@ function deleteCategory(id) {
     })
     .then((result) => {
       if (result.isConfirmed) {
-        store.dispatch("destroyCategory", id).then((res) => {
+        document.body.style.cursor = 'wait';
+                store.dispatch("destroyCategory", id).then((res) => {
           if (res) {
             common.showToast({ title: res.message, icon: "success" });
+            document.body.style.cursor = 'default';
             filteredCategories.value = categories.value.filter((c)=>c.id != id);
             categories.value = filteredCategories.value ;
           }

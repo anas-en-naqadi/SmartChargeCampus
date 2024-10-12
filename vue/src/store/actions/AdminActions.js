@@ -1,3 +1,4 @@
+import axios from "axios";
 import axiosClient from "../../../axios";
 
 const adminActions = {
@@ -15,6 +16,17 @@ const adminActions = {
             try {
                 const response = await axiosClient.get("/client");
                 return response.data;
+            } catch (error) {
+                return error;
+            }
+        },
+        async fetchSuppliers({ commit }) {
+            try {
+                const response = await axiosClient.get("/supplier");
+               if(response && response.status ===200 && response.data){
+                commit("SET_SUPPLIER",response.data);
+                return response.data;
+               }
             } catch (error) {
                 return error;
             }
@@ -78,24 +90,8 @@ const adminActions = {
                 return err;
             }
         },
-        async changeUserStatus({ commit }, {user_id,status}) {
-            try {
 
-                const response = await axiosClient.post("/changeStatus-user",{user_id,status});
-                return response;
-            } catch (error) {
-                return error;
-            }
-        },
-        async filterByDates({ commit }, {date,type}) {
-            try {
-                var url = type === "invoice" ? "/filterInvoicesByDates" : (type==="order" ? "/filterOrdersByDates" :"/filterSellsByDates");
-                const response = await axiosClient.post(url,date);
-                return response;
-            } catch (error) {
-                return error;
-            }
-        },
+
         async updatePassword({ commit }, passwordBag) {
             try {
                 const res = await axiosClient.post("/update-pass", passwordBag);
@@ -139,9 +135,9 @@ const adminActions = {
             } catch (error) {
                 return error;
             }
-        },async getThisMonthSales() {
+        },async fetchMonthlySales() {
             try {
-                const response = await axiosClient.get("/this-month");
+                const response = await axiosClient.get("/month-remaining");
                 return response.data;
             } catch (error) {
                 return error;
@@ -155,9 +151,17 @@ const adminActions = {
                 return error;
             }
         },
-        async getlastUsers() {
+        async fetchLastClients() {
             try {
-                const response = await axiosClient.get("/last-users");
+                const response = await axiosClient.get("/last-clients");
+                return response.data;
+            } catch (error) {
+                return error;
+            }
+        },
+        async fetchLastSells() {
+            try {
+                const response = await axiosClient.get("/last-sells");
                 return response.data;
             } catch (error) {
                 return error;
@@ -172,15 +176,8 @@ const adminActions = {
                 return error;
             }
         },
-        async getOrdersStatus() {
-            try {
-                const response = await axiosClient.get("/status-orders");
-                return response.data;
-            } catch (error) {
-                return error;
-            }
-        },
-     
+
+
         async getSells() {
             try {
                 const response = await axiosClient.get("/sells");
@@ -197,14 +194,7 @@ const adminActions = {
                 return error;
             }
         },
-        async getInvoices() {
-            try {
-                const response = await axiosClient.get("/invoice");
-                return response.data;
-            } catch (error) {
-                return error;
-            }
-        },
+
         async getCategories() {
             try {
                 const response = await axiosClient.get("/category");
@@ -224,18 +214,21 @@ const adminActions = {
         },
 
 
-        async storeInvoice({ commit }, invoice) {
-            try {
-                const response = await axiosClient.post("/invoice", invoice);
-                return response;
-            } catch (error) {
-                return error;
-            }
-        },
+
         async destroyProduct({ commit }, product_id) {
             try {
                 const response = await axiosClient.delete(
                     `/product/${product_id}`
+                );
+                return response.data;
+            } catch (error) {
+                return error;
+            }
+        },
+        async destroyPurchase({ commit }, purchase_id) {
+            try {
+                const response = await axiosClient.delete(
+                    `/purchase/${purchase_id}`
                 );
                 return response.data;
             } catch (error) {
@@ -258,11 +251,7 @@ const adminActions = {
             return await axiosClient.post("/setReadAt", now);
         },
 
-       async setAsAdmin({ commit }, user_id) {
-            return await axiosClient.post("/toAdmin", user_id).then((res) => {
-                return res;
-            });
-        },
+
         async getProduct({ commit }, product_id) {
             try {
                 const response = await axiosClient.get(
@@ -284,35 +273,32 @@ const adminActions = {
                 return error;
             }
         },
-        async getOrderById({ commit }, id) {
-            try {
-                const response = await axiosClient.get(`/order/${id}`);
-                return response;
-            } catch (error) {
-                return error;
-            }
-        },
-        async getInvoiceById({ commit }, id) {
-            try {
-                const response = await axiosClient.get(`/invoice/${id}`);
-                return response;
-            } catch (error) {
-                return error;
-            }
-        },
-
-
-        async updateInvoice({ commit }, { invoice, id }) {
+        async updatePurchase({ commit }, { purchase, purchase_id }) {
             try {
                 const response = await axiosClient.put(
-                    `/invoice/` + id,
-                    invoice
+                    `/purchase/${purchase_id}`,
+                    purchase
                 );
                 return response;
             } catch (error) {
                 return error;
             }
         },
+        async newDebt({ commit }, data) {
+            try {
+                const response = await axiosClient.post(
+                    'new-debt',
+                    data
+                );
+                return response;
+            } catch (error) {
+                return error;
+            }
+        },
+
+
+
+
         async storeCategory({ commit }, category_name) {
             try {
                 const response = await axiosClient.post(`/category`, {
@@ -322,7 +308,122 @@ const adminActions = {
             } catch (error) {
                 return error;
             }
+        },
+        async productDetails({ commit }, product_id) {
+            try {
+                const response = await axiosClient.get(`/product/${product_id}`);
+                return response;
+            } catch (error) {
+                return error;
+            }
+        },
+        async fetchExpense() {
+            try {
+                const response = await axiosClient.get("/expense");
+                return response;
+            } catch (error) {
+                return error;
+            }
+        },
+        async fetchActivities() {
+            try {
+                const response = await axiosClient.get("/activity");
+                return response;
+            } catch (error) {
+                return error;
+            }
+        },
+        async destroyExpense({ commit }, id) {
+            try {
+                const response = await axiosClient.delete(`/expense/${id}`);
+                return response;
+            } catch (error) {
+                return error;
+            }
+        },
+        async filterByDates({ commit }, date) {
+            try {
+                const response = await axiosClient.post("/filterSellsByDates",date);
+                return response;
+            } catch (error) {
+                return error;
+            }
+        },
+        async storeExpense({ commit }, expense) {
+            try {
+                const response = await axiosClient.post("/expense", expense);
+                return response;
+            } catch (error) {
+                return error;
+            }
+        },
+        async fetchPurchases({commit}){
+          try{
+            const response =  await axiosClient.get("/purchase");
+            return response;
+          }catch(error){
+            return error;
+          }
+
+        },
+        async storeSupplier({commit},supplier){
+            try{
+                const response =await axiosClient.post("/supplier",supplier);
+                return response;
+            }catch(error){
+                return error;
+            }
+        },
+        async updateSupplier({commit},{supplier,supplier_id}){
+            try{
+                const response =await axiosClient.put(`/supplier/${supplier_id}`,supplier);
+                return response;
+            }catch(error){
+                return error;
+            }
+        },
+            async editSupplier({commit},id){
+                try{
+                    const response =await axiosClient.get(`/supplier/${id}`);
+                    return response;
+                }catch(error){
+                    return error;
+                }
+            },
+            async editPurchase({commit},id){
+                try{
+                    const response =await axiosClient.get(`/purchase/${id}`);
+                    return response;
+                }catch(error){
+                    return error;
+                }
+            },
+        async destroySupplier({ commit }, id) {
+            try {
+                const response = await axiosClient.delete(`/supplier/${id}`);
+                return response;
+            } catch (error) {
+                return error;
+            }
+        },
+
+        async storeNewPurchase({commit},purchase){
+            try{
+                const response = await axiosClient.post("/purchase",purchase);
+                return response;
+            }catch(error){
+                return error;
+            }
+        },
+        async storeExistingPurchase({commit},purchase){
+            try{
+                const response = await axiosClient.post("/existing-purchase",purchase);
+                return response;
+            }catch(error){
+                return error;
+            }
         }
+
 }
 
 export default adminActions;

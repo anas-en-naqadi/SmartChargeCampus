@@ -15,7 +15,9 @@ class Sell extends Model
 
     public function products()
     {
-        return $this->hasManyThrough(Product::class, SellProduct::class, 'sell_id', 'id', 'id', 'product_id');
+        return $this->belongsToMany(Product::class, 'sell_products', 'sell_id', 'product_id')
+                    ->withPivot('quantity') // Include quantity from the pivot table
+                    ->withTimestamps(); // Optionally include timestamps if needed
     }
     public function client(){
         return $this->belongsTo(Client::class);
