@@ -273,7 +273,7 @@ import Buton from "../../components/Button.vue";
 const visible = ref(false);
 const toast = useToast();
 const loaderButton = ref(false);
-const categories = ref([]);
+const categories = computed(()=>store.state.categories);
 const products = computed(() => store.state.products);
 const filteredProducts = ref([]);
 const skeletonObjects = new Array(10);
@@ -290,19 +290,10 @@ const loading = ref(false);
 
 onMounted(() => {
     fetchProducts();
-    fetchCategories();
-});
-function fetchCategories() {
     store
-        .dispatch("getCategories")
-        .then((res) => {
-            categories.value = res;
-        })
-        .catch((error) => console.error(error))
-        .finally(() => {
-            loading.value = true;
-        });
-}
+    .dispatch("getCategories");
+});
+
 function make_changes(res) {
     visible.value = false;
     common.showToast({ title: res.data.message, icon: "success" });
@@ -354,6 +345,7 @@ function updateProduct() {
 
 }
 function editProduct(id) {
+    document.body.style.cursor='wait';
 
     store
         .dispatch("getProduct", id)
@@ -367,6 +359,8 @@ function editProduct(id) {
                 product.value.purchase_price = res.data.purchase_price;
                 product.value.stock_quantity = res.data.stock_quantity;
                 product.value.expiration_date = res.data.expiration_date;
+                document.body.style.cursor='default';
+
                 visible.value = true;
             }
         })

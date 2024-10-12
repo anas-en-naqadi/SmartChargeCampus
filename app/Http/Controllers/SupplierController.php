@@ -22,7 +22,8 @@ class SupplierController extends Controller
                     'phone' => $query->phone,
                     'cni' => $query->cni,
                     'purchase_count' => $query->sells()->count(),
-                    'total_credit' => $query->total_credit
+                    'total_credit' => $query->total_credit,
+                    'created_at'=>$query->created_at
                 ];
             });
 
@@ -42,7 +43,7 @@ class SupplierController extends Controller
         saveActivity($client, 'إضافة مورد جديد', 'إضافة');
         return response()->json([
             'message' => 'تم إنشاء المورد بنجاح.',
-            'client' => $client
+            'supplier' => $client
         ], 200); // 201 Created
     }
 
@@ -90,7 +91,7 @@ class SupplierController extends Controller
         saveActivity($client, 'تحديث بيانات المورد', 'تحديث');
         return response()->json([
             'message' => 'تم تحديث بيانات المورد بنجاح.',
-
+            'supplier' => $client
         ], 200);
     }
 

@@ -194,6 +194,11 @@
                         <Skeleton></Skeleton>
                     </template>
                 </Column>
+                <Column field="cni" class="border-b-[1px] w-[5rem] text-center" header="رقم بطاقة الهوية ">
+                    <template #body>
+                        <Skeleton></Skeleton>
+                    </template>
+                </Column>
                 <Column field="phone" headerStyle="text-align:center" class="border-b-[1px] text-center"
                     header="رقم الهاتف">
                     <template #body>
@@ -223,7 +228,6 @@ import common from "../../utils/common";
 import { useToast } from "primevue/usetoast";
 const clients = ref([]);
 const user = ref({ is_admin: " ", name: "", email: "", phone: "" });
-const visible1 = ref(false);
 const visible2 = ref(false);
 const loading = ref(false);
 
@@ -277,41 +281,8 @@ function filterTable(event) {
     );
 }
 
-function changeStatus(id, status) {
-  common
-    .showSwal({
-        title: "هل أنت متأكد؟",
-        text: "! لن تتمكن من التراجع عن هذا",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: `yes, ${
-        status === "inactive" ? "deactivate" : "active"
-      } it !`,
-    })
-    .then((result) => {
-      if (result.isConfirmed) {
-        store
-          .dispatch("changeUserStatus", { user_id: id, status: status })
-          .then((res) => {
-            if (res.status === 200 && res.data) {
-              fetchClients();
-              common.showToast({ title: res.data.message, icon: "success" });
-            } else if (res.response.status === 500)
-              common.showToast({
-                title: res.response.data.message,
-                icon: "error",
-              });
-          });
-      }
-    });
-}
 
-function showDialog(id) {
-  visible1.value = true;
-  userId = id;
-}
+
 
 
 function newUser() {

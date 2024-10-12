@@ -22,7 +22,7 @@ class CategoryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'category_name' => 'string|required'
+            'category_name' => 'string|required|unique:categories'
         ];
 
     }
@@ -30,7 +30,7 @@ class CategoryRequest extends FormRequest
     public function messages():array{
    return [
      'category_name.string' => 'يجب أن يكون اسم الفئة نصًا.',
-    'category_name.required' => 'حقل اسم الفئة مطلوب.'
-];
+     'category_name.required' => 'حقل اسم الفئة مطلوب.',
+     'category_name.unique' => 'اسم الفئة موجود بالفعل. يرجى اختيار اسم آخر.'];
 }
 }

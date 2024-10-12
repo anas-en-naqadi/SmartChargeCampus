@@ -98,21 +98,18 @@
         </div>
 
         <Dialog v-model:visible="visible" modal header="إضافة فئة" class="w-[30%]">
-          <div class="w-ful">
-            <div class="relative z-0 w-full mb-5 group">
-                <label for="category_name" class="block mb-2 text-sm font-medium text-gray-500">اسم الفئة</label>
-                <input v-model="category_name" type="text" id="category_name"
-                    class="block py-2 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                    placeholder="إلكترونيات..." required />
-            </div>
-
-            <div class="w-full">
-                    <button id="action_button" type="button" @click="addCategory"
-                        class="text-white bg-green-600 w-full hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm  px-5 py-2.5 text-center">
-                        إضافة
-                    </button>
+            <div class="w-ful">
+                <div class="relative z-0 w-full mb-5 group">
+                    <label for="category_name" class="block mb-2 text-sm font-medium text-gray-500">اسم الفئة</label>
+                    <input v-model="category_name" type="text" id="category_name"
+                        class="block py-2 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                        placeholder="إلكترونيات..." required />
                 </div>
-          </div>
+
+                <div class="w-full">
+                    <Buton :loading="loaderButton" color="green" @trigger-event="addCategory" string="إضافة" />
+                </div>
+            </div>
         </Dialog>
         <Toast />
     </div>
@@ -121,88 +118,93 @@
 
 <script setup>
 import common from "../../utils/common";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import store from "../../store";
 import { useToast } from "primevue/usetoast";
-const categories = ref([]);
+import Buton from "../../components/Button.vue";
+const categories = computed(() => store.state.categories);
 const loading = ref(true);
 const filteredCategories = ref([]);
 const visible = ref(false);
+const loaderButton = ref(false);
+const skeletonObjects = new Array(10);
+
 const toast = useToast();
 let category_name = null;
-const category = ref([]);
 onMounted(() => {
-  fetchCategories();
+    fetchCategories();
 });
 
 function fetchCategories() {
-  store
-    .dispatch("getCategories")
-    .then((res) => {
-      categories.value = res;
-      filteredCategories.value = res;
-    })
-    .catch((error) => console.error(error))
-    .finally(() => {
-      loading.value = false;
-    });
+    store
+        .dispatch("getCategories")
+        .then((res) =>
+            filteredCategories.value = res.data
+        )
+        .catch((error) => error)
+        .finally(() =>
+            loading.value = false
+        );
 }
 
 function clearFilter() {
-  document.getElementById("searchInput").value = "";
-  filteredCategories.value = categories.value;
+    document.getElementById("searchInput").value = "";
+    filteredCategories.value = categories.value;
 }
 function filterTable(event) {
-  const filter = event.target.value.toLowerCase();
+    const filter = event.target.value.toLowerCase();
 
-  if (!filter) filteredCategories.value = categories.value;
-  else
-    filteredCategories.value = categories.value.filter((c) =>
-      c.category_name.toLowerCase().includes(filter)
-    );
+    if (!filter) filteredCategories.value = categories.value;
+    else
+        filteredCategories.value = categories.value.filter((c) =>
+            c.category_name.toLowerCase().includes(filter)
+        );
 }
 
 function addCategory() {
-  store
-    .dispatch("storeCategory", category_name)
-    .then((res) => {
-      if (res.status === 200 && res.data) {
-        visible.value = false;
-        common.showToast({ title: res.data.message, icon: "success" });
-          filteredCategories.value.push(res.data.category);
-          categories.value = filteredCategories.value;
-          category_name = null;
-    }
-      common.showValidationErrors(res,toast);
-    })
-    .catch((error) => error);
+    loaderButton.value = true;
+    store
+        .dispatch("storeCategory", category_name)
+        .then((res) => {
+            if (res.status === 200 && res.data) {
+                visible.value = false;
+                common.showToast({ title: res.data.message, icon: "success" });
+                filteredCategories.value.sort((a,b)=> {
+        return new Date(b.created_at) - new Date(a.created_at);
+    });
+                filteredCategories.value.push(res.data.category);
+                store.commit("SET_CATEGORIES", filteredCategories.value);
+                category_name = null;
+
+            }
+            common.showValidationErrors(res, toast);
+        })
+        .catch((error) => error).finally(() => loaderButton.value = false);
 }
 
 function deleteCategory(id) {
-  common
-    .showSwal({
-        title: "هل أنت متأكد؟",
-        text: "! لن تتمكن من التراجع عن هذا",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-        confirmButtonText: "! نعم، احذفها",
-    })
-    .then((result) => {
-      if (result.isConfirmed) {
-        document.body.style.cursor = 'wait';
+    common
+        .showSwal({
+            title: "هل أنت متأكد؟",
+            text: "! لن تتمكن من التراجع عن هذا",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "! نعم، احذفها",
+        })
+        .then((result) => {
+            if (result.isConfirmed) {
+                document.body.style.cursor = 'wait';
                 store.dispatch("destroyCategory", id).then((res) => {
-          if (res) {
-            common.showToast({ title: res.message, icon: "success" });
-            document.body.style.cursor = 'default';
-            filteredCategories.value = categories.value.filter((c)=>c.id != id);
-            categories.value = filteredCategories.value ;
-          }
+                    if (res) {
+                        common.showToast({ title: res.message, icon: "success" });
+                        document.body.style.cursor = 'default';
+                        filteredCategories.value = categories.value.filter((c) => c.id != id);
+                        store.commit("SET_CATEGORIES", filteredCategories.value);
+                    }
+                });
+            }
         });
-      }
-    });
 }
-// Define skeleton data
-const skeletonObjects = new Array(10);
 </script>

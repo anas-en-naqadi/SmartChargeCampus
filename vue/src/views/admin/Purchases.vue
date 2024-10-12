@@ -261,17 +261,16 @@ import Buton from "../../components/Button.vue";
 const visible1 = ref(false);
 const visible2 = ref(false);
 const toast = useToast();
-const categories = ref([]);
+const categories = computed(() => store.state.categories);
+const skeletonObjects = new Array(10);
+
 const products = computed(() => store.state.products);
 const suppliers = computed(() => store.state.suppliers);
 const loaderButton = ref(false);
-const purchases = ref([]);
+const purchases = computed(() => store.state.purchases);
 const filteredPurchases = ref([]);
 const purchase = ref({
-    purchase_price: null,
-    expiration_date: null,
     transporter_id: 0,
-    stock_quantity: null,
     category_id: 0,
 });
 const loading = ref(true);
@@ -280,19 +279,10 @@ onMounted(() => {
     getPurchases();
     store.dispatch("fetchSuppliers");
     store.dispatch("getProducts");
-    fetchCategories();
-});
-function fetchCategories() {
     store
-        .dispatch("getCategories")
-        .then((res) => {
-            categories.value = res;
-        })
-        .catch((error) => console.error(error))
-        .finally(() => {
-            loading.value = false;
-        });
-}
+        .dispatch("getCategories");
+});
+
 function updatePurchase() {
     loaderButton.value = true;
 
@@ -315,6 +305,7 @@ function updatePurchase() {
 
 }
 function editPurchase(id) {
+    document.body.style.cursor = 'wait';
 
     store
         .dispatch("editPurchase", id)
@@ -331,6 +322,7 @@ function editPurchase(id) {
                 purchase.value.expiration_date = res.data.expiration_date;
                 visible2.value = res.data.updated_product ? false : true;
 
+                document.body.style.cursor = 'default';
 
                 visible1.value = true;
             }
@@ -358,10 +350,10 @@ function addExistingPurchase() {
         .dispatch("storeExistingPurchase", purchase.value)
         .then((res) => {
 
-            if (res.status === 200 && res.data) {
+            if (res.status === 200 && res.data)
 
                 make_changes(res);
-            }
+
             else {
                 common.showValidationErrors(res, toast);
                 loaderButton.value = false;
@@ -402,16 +394,16 @@ function make_changes(res) {
 
     visible1.value = false;
     common.showToast({ title: res.data.message, icon: "success" });
-    if(res.data.purchase.id){
+    if (res.data.purchase.id) {
         const index = filteredPurchases.value.findIndex(p => p.id === res.data.purchase.id);
-       if (index !== -1) {
-        filteredPurchases.value[index] = res.data.purchase;
+        if (index !== -1) {
+            filteredPurchases.value[index] = res.data.purchase;
 
-    }
+        }
 
-    }else
-    filteredPurchases.value.push(res.data.purchase);
-    purchases.value = filteredPurchases.value;
+    } else
+        filteredPurchases.value.push(res.data.purchase);
+    store.commit("SET_PURCHASES", filteredPurchases.value);
 
 
     filteredPurchases.value.sort((a, b) => {
@@ -436,20 +428,14 @@ function clearFilter() {
 function getPurchases() {
     store
         .dispatch("fetchPurchases")
-        .then((res) => {
-            if (res && res.status === 200 && res.data) {
-                purchases.value = res.data;
-                filteredPurchases.value = purchases.value;
-            }
-        })
-        .catch((error) => console.error(error))
+        .then((res) => filteredPurchases.value = res.data)
+        .catch((error) => error)
         .finally(() => {
             loading.value = false;
         });
 }
 
 function deletePurchase(id) {
-    console.log(id)
     common
         .showSwal({
             title: "هل أنت متأكد؟",
@@ -468,6 +454,8 @@ function deletePurchase(id) {
                     if (res) {
                         common.showToast({ title: res.message, icon: "success" });
                         filteredPurchases.value = filteredPurchases.value.filter((p) => p.id != id);
+                        store.commit("SET_PURCHASES", filteredPurchases.value);
+
                         document.body.style.cursor = 'default';
                     }
                 });
@@ -487,8 +475,6 @@ function filterTable(event) {
         );
 }
 
-// Define skeleton data
-const skeletonObjects = new Array(10);
 
 
 </script>

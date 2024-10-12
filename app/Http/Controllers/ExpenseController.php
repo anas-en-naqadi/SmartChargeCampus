@@ -13,7 +13,7 @@ class ExpenseController extends Controller
         $cacheKey="expenses";
         $cacheData = getCachedData($cacheKey,function(){
             $user = getSimpleUser();
-            $expenses = $user->expenses;
+            $expenses = $user->expenses()->latest()->get();
             return $expenses;
         });
 
