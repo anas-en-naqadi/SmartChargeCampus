@@ -11,7 +11,7 @@ class Sell extends Model
     use HasFactory,SoftDeletes;
 
 
-    protected $fillable = ['client_id','user_id', 'total_price', 'paid_amount', 'remaining_amount', 'status',"check","check_date"];
+    protected $fillable = ['client_id','user_id', 'total_price', 'paid_amount', 'remaining_amount', 'status',"payment_method","check_date","change"];
 
     public function products()
     {
@@ -23,4 +23,7 @@ class Sell extends Model
         return $this->belongsTo(Client::class);
     }
 
+    public function user(){
+        return $this->belongsTo(User::class);
+        }
 }

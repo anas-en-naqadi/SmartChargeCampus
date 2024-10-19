@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CategoryRequest;
@@ -16,7 +16,7 @@ class CategoryController extends Controller
     {
         $cacheKey = 'categories';
         $cacheData = getCachedData($cacheKey, function () {
-        $categories =getSimpleUser()->categories;
+        $categories =getSimpleUser()->categories()->latest()->get();
         return $categories;
         });
         saveActivity(new Category(), "تم عرض قائمة الفئات", "تحديد");
@@ -38,18 +38,16 @@ class CategoryController extends Controller
         return $category ? response()->json(['message'=>'تمت إضافة فئة جديدة بنجاح','category'=>$category],200) : response()->json('oops, something went wrong!!',500);
     }
 
-    public function destroy($id)
+    public function destroy(Category $category)
     {
-        try {
-            $category = Category::findOrFail($id);
-            saveActivity(new Category(), "$category->name : تم حذف الفئة ", "حذف");
+        if($category){
+            saveActivity(new Category(), "{$category->category_name} : تم حذف الفئة ", "حذف");
             $category->delete();
             Redis::del('categories');
-
-
             return response()->json(['message' => ' تم حذف الفئة بنجاح' ]);
-        } catch (ModelNotFoundException $message) {
-            return response()->json(['message' => 'عفواً، حدث خطأ ما']);
         }
+
+
+
     }
 }

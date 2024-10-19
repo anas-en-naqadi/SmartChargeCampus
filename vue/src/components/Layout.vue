@@ -255,7 +255,7 @@
                                                 d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
                                         </svg>
 
-                                        <span class="sr-only">Notifications</span>
+                                        <span class="sr-only">الإشعارات</span>
                                         <div id="counter"
                                             class="absolute inline-flex items-center justify-center md:w-4 md:h-4 w-6 h-6 text-xs font-bold text-white bg-red-500 border-1 text-center border-black rounded-full top-2 end-1.5 ">
                                             {{ counter }}
@@ -263,11 +263,11 @@
                                     </button>
                                 </div>
                                 <div v-if="notifiable" id="toast-notification"
-                                    class="absolute top-24 z-50 md:w-88 p-4 text-gray-900 bg-white rounded-lg shadow-lg border-gray-500 white:bg-gray-800 white:text-gray-300"
+                                    class="absolute top-24 w-[23rem] z-50 md:w-88 p-4 text-gray-900 bg-white rounded-lg shadow-lg border-gray-500 white:bg-gray-800 white:text-gray-300"
                                     role="alert">
                                     <div class="flex items-center mb-3 z-50">
-                                        <span class="mb-1 text-md font-semibold text-gray-900 white:text-white">New
-                                            notifications</span>
+                                        <span class="mb-1 text-md font-semibold text-gray-900 white:text-white">
+                                            الإشعارات</span>
                                         <button type="button" id="notif-box" @click="notifiable = !notifiable"
                                             class="ms-auto -mx-1.5 -my-1.5 bg-white justify-center items-center flex-shrink-0 text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex h-8 w-8 white:text-gray-500 white:hover:text-white white:bg-gray-800 white:hover:bg-gray-700"
                                             data-dismiss-target="#toast-notification" aria-label="Close">
@@ -281,29 +281,18 @@
                                         </button>
                                     </div>
                                     <hr class="mb-2 text-gray-900 font-bold w-[20rem] -ml-4" />
-                                    <div class="flex items-center flex-col md:h-52 overflow-scroll"
+                                    <div class="flex items-center w-full flex-col p-2 h-[12.5rem] overflow-y-scroll overflow-x-hidden"
                                         v-if="notifications.length">
-                                        <div class="ms-3 text-sm font-normal m-1.5"
+                                        <div class=" text-sm flex gap-3 flex-col font-normal text-right m-1.5 w-full"
                                             v-for="(notification, index) in notifications" :key="index">
-                                            <div v-if="notification.data.name"
-                                                @click="redirectTo(notification.data.url)"
-                                                class="text-sm text-gray-700 font-semibold white:text-white">
-                                                l'utilisateur
-                                                <span class="text-red-600">{{
-                                                    notification.data.name
-                                                }}</span>
-                                                a passer une commande avec id: {{ notification.data.order_id }}!!
-                                            </div>
-                                            <div v-else @click="redirectTo(notification.data.url)"
-                                                class="text-sm text-gray-700 font-semibold white:text-white">
-                                                Le stock du produit
-                                                <span class="font-bold text-red-500">{{
-                                                    (notification.data.product_name).toUpperCase()
-                                                }}</span>
-                                                est actuellement inférieur à 10. Merci de vérifier.
-                                            </div>
 
-                                            <span class="text-xs font-medium text-blue-600 white:text-blue-500">
+                                            <router-link :to="{ name: notification.data.url }">
+                                                <span v-html="notification.data.message"
+                                                    class="text-sm  font-semibold white:text-white"></span>
+                                            </router-link>
+
+                                            <span
+                                                class="text-xs font-medium text-blue-600 ml-auto text-right white:text-blue-500">
                                                 {{ common.timeSince(notification.created_at) }}
                                             </span>
 
@@ -312,11 +301,11 @@
                                     </div>
 
                                     <div v-else class="text-gray-600 text-center text-sm font-semibold">
-                                        No Notifications !!
+                                        لا توجد إشعارات
                                     </div>
                                     <div v-if="notifications.length" @click="deleteAllNotifiable()"
-                                        class="text-gray-600 text-center font-bold text-sm cursor-pointer hover:underline p-1">
-                                        Clear All
+                                        class="text-red-600 border-t-2  text-center font-bold text-sm cursor-pointer hover:underline py-1.5 w-full">
+                                        مسح الكل
                                     </div>
                                 </div>
                             </div>
@@ -342,7 +331,7 @@
                                     </div>
                                 </div>
 
-                                <avatar :fullname="'Anas Ennaqadi'" :size="50"></avatar>
+                                <avatar :fullname="user.name" :size="50"></avatar>
                             </div>
                         </a>
                     </div>
@@ -368,16 +357,16 @@
                                     </router-link>
                                 </li>
                                 <li>
-                                        <router-link :to="{ name: 'categories' }" :class="{
-                                            'text-white bg-cyan-500': route.name === 'categories',
-                                            'text-base text-gray-900 font-normal rounded-lg hover:bg-gray-100 hover:text-gray-900 group transition duration-75 flex items-center p-2': true
-                                        }">
-                                            <i class="fas fa-th-large"></i>
+                                    <router-link :to="{ name: 'categories' }" :class="{
+                                        'text-white bg-cyan-500': route.name === 'categories',
+                                        'text-base text-gray-900 font-normal rounded-lg hover:bg-gray-100 hover:text-gray-900 group transition duration-75 flex items-center p-2': true
+                                    }">
+                                        <i class="fas fa-th-large"></i>
 
 
-                                            <span class="ml-3"> جميع الفئات</span>
-                                        </router-link>
-                                    </li>
+                                        <span class="ml-3"> جميع الفئات</span>
+                                    </router-link>
+                                </li>
                                 <li>
                                     <router-link :to="{ name: 'purchases' }" :class="{
                                         'text-white bg-fuchsia-600': route.name === 'purchases',
@@ -410,8 +399,8 @@
                                     </router-link>
                                 </li>
                                 <li>
-                                    <router-link :to="{ name: 'invoices' }" :class="{
-                                        'text-white bg-sky-500': route.name === 'invoices',
+                                    <router-link :to="{ name: 'new-sale' }" :class="{
+                                        'text-white bg-sky-500': route.name === 'new-sale',
                                         'text-base text-gray-900 font-normal rounded-lg hover:bg-gray-100 hover:text-gray-900 group transition duration-75 flex items-center p-2': true
                                     }">
                                         <i class="fas fa-plus-square"></i>
@@ -422,13 +411,13 @@
                             <div class="space-y-2 pt-2">
                                 <ul class="space-y-2 pb-2">
                                     <li>
-                                    <router-link :to="{ name: 'admin-all-products' }" :class="{
-                                        'text-white bg-violet-600': route.name === 'admin-all-products',
-                                        'text-base text-gray-900 font-normal rounded-lg hover:bg-gray-100 hover:text-gray-900 group transition duration-75 flex items-center p-2': true
-                                    }"><i class="fas fa-clipboard-list"></i>
-                                        <span class="ml-3 flex-1 whitespace-nowrap">تقرير المخزون</span>
-                                    </router-link>
-                                </li>
+                                        <router-link :to="{ name: 'admin-all-products' }" :class="{
+                                            'text-white bg-violet-600': route.name === 'admin-all-products',
+                                            'text-base text-gray-900 font-normal rounded-lg hover:bg-gray-100 hover:text-gray-900 group transition duration-75 flex items-center p-2': true
+                                        }"><i class="fas fa-clipboard-list"></i>
+                                            <span class="ml-3 flex-1 whitespace-nowrap">تقرير المخزون</span>
+                                        </router-link>
+                                    </li>
 
 
                                     <li>
@@ -442,14 +431,14 @@
                                         </router-link>
                                     </li>
                                     <li>
-                                    <router-link :to="{ name: 'suppliers' }" :class="{
-                                        'text-white bg-pink-500': route.name === 'suppliers',
-                                        'text-base text-gray-900 font-normal rounded-lg hover:bg-gray-100 hover:text-gray-900 group transition duration-75 flex items-center p-2': true
-                                    }">
-<i class="fas fa-file-contract"></i>
-<span class="ml-3 flex-1 whitespace-nowrap">تقارير الموردين </span>
-                                    </router-link>
-                                </li>
+                                        <router-link :to="{ name: 'suppliers' }" :class="{
+                                            'text-white bg-pink-500': route.name === 'suppliers',
+                                            'text-base text-gray-900 font-normal rounded-lg hover:bg-gray-100 hover:text-gray-900 group transition duration-75 flex items-center p-2': true
+                                        }">
+                                            <i class="fas fa-file-contract"></i>
+                                            <span class="ml-3 flex-1 whitespace-nowrap">تقارير الموردين </span>
+                                        </router-link>
+                                    </li>
 
                                     <li>
                                         <router-link :to="{ name: 'expenses' }" :class="{
@@ -563,14 +552,14 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted } from "vue";
+import { computed, onBeforeUnmount, ref, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import store from "../store";
 import common from "../utils/common";
 import Avatar from "vue-avatar-component";
 
 const user = computed(() => store.state.user.data);
-const notifications = ref({});
+const notifications = ref([]);
 const router = useRouter();
 const route = useRoute(); // Access the current route
 const counter = ref(0);
@@ -579,13 +568,19 @@ const notifiable = ref(false);
 onMounted(() => {
     fetchNotifications();
     store.dispatch("getLoggedUser");
+    const notificationInterval = setInterval(() => {
+        fetchNotifications();
+
+    }, 60000);
+
+    // Clear the interval when the app is closed or unmounted
+    onBeforeUnmount(() => {
+        clearInterval(notificationInterval);
+    });
 });
-function redirectTo(url) {
-    if (url) {
-        router.push(url);
-        notifiable.value = false;
-    }
-}
+
+
+
 function toggle() {
     document.getElementById("sidebar").classList.toggle("hidden");
     document
@@ -598,7 +593,7 @@ function toggle() {
 function fetchNotifications() {
     store.dispatch("getNotifications").then((res) => {
         notifications.value = res;
-        counter.value = notifications.value.length;
+        counter.value = notifications.value.filter((n)=>n.read_at === null).length;
     });
 }
 function logout() {
@@ -610,9 +605,20 @@ function logout() {
         }
     });
 }
+function deleteAllNotifiable() {
+    store.dispatch("deleteNotifications").then((res) => {
+        if (res && res.status === 200 && res.data) {
+            common.showToast({ title: res.data.message, icon: "success" });
+            notifiable.value = false;
+            counter.value = 0;
+            notifications.value = [];
+        }
+    })
+}
 
 function setRead_at() {
     counter.value = 0;
+
     const now = new Date();
     store.dispatch("setReadAt", now);
 }

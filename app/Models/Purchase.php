@@ -23,6 +23,10 @@ class Purchase extends Model
     {
         return $this->transporter ? $this->transporter->name : null; // Return null if no transporter is assigned
     }
+    public function getCategoryNameAttribute()
+    {
+        return $this->category ? $this->category->category_name : null; // Return null if no transporter is assigned
+    }
 
         public function category(){
             return $this->belongsTo(Category::class);

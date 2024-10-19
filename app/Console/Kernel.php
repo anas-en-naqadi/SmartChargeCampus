@@ -12,7 +12,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-         $schedule->command('app:alert-out-stock')->everyMinute();
+         $schedule->command('app:product-checks')->dailyAt("8:00");
+         $schedule->command('app:check-date')->dailyAt("8:00");
     }
 
     /**

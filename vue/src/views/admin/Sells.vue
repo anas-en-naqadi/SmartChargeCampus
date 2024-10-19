@@ -48,7 +48,9 @@
                 <template #empty>.لا توجد مبيعات</template>
                 <!-- Columns -->
                 <Column field="client_name" class="border-b-[1px] text-center" header="اسم الزبون">
-
+                    <template #body="{data}">
+                        <span>{{ data.client_name ?? '-'}} </span>
+                    </template>
                 </Column>
 
                 <Column field="total_price" class="border-b-[1px] text-center" header="مجموع الحساب" sortable>
@@ -67,26 +69,37 @@
                         <span>{{ common.formatNumber(data.remaining_amount) }} درهم</span>
                     </template>
                 </Column>
+                <Column field="change" class="border-b-[1px] text-center" header="الصرف" >
+                    <template #body="{ data }">
+                        <span>{{ common.formatNumber(data.change) }} درهم</span>
+                    </template>
+                </Column>
                 <Column field="status" class="border-b-[1px] text-center" header="الحالة" sortable>
                     <template #body="{ data }">
                         <span :class="[
                             data.status === 'مدفوع' ? 'bg-green-500' :
-                                (data.status === 'متبقي' ? 'bg-orange-500' : 'bg-red-500'),
+                               ' bg-orange-500',
                             'text-sm', 'text-white', 'rounded-md','text-center', 'px-1.5', 'py-1'
                         ]">
                             {{ data.status }}
                         </span> </template>
                 </Column>
-                <Column field="check" class="border-b-[1px] text-center" header="الشيك" sortable>
+                <Column field="" class="border-b-[1px] text-center" header="طريقة الدفع" sortable>
                     <template #body="{ data }">
-                        <span>{{ data.check ? "نعم" : "لا" }}</span>
+                        <span :class="['text-xs text-white rounded-md p-1.5 border' , data.payment_method == 'نقدًا' ? 'bg-gray-500' : 'bg-sky-500']">{{ data.payment_method }}</span>
                     </template>
                 </Column>
-                <Column field="check" class="border-b-[1px] text-center" header="تاريخ دفع الشيك">
+                <Column field="" class="border-b-[1px] text-center" header="تاريخ دفع الشيك">
                     <template #body="{ data }">
                         <span>{{ data.check ? common.formatDate(data.check_date) : "-" }}</span>
                     </template>
                 </Column>
+                <Column field="" class="border-b-[1px] text-center" header="تاريخ العملية ">
+                    <template #body="{ data }">
+                        <span>{{  common.formatDate(data.created_at)  }}</span>
+                    </template>
+                </Column>
+
 
                 <Column header="الطباعة" class=" border-b-[1px] text-center">
                     <template #body="{ data }">
@@ -146,6 +159,11 @@
                         <Skeleton></Skeleton>
                     </template>
                 </Column>
+                <Column field="remaining_amount" class="border-b-[1px] text-center" header="الصرف" >
+                    <template #body>
+                        <Skeleton></Skeleton>
+                    </template>
+                </Column>
                 <Column field="" class="border-b-[1px] text-center" header="الحالة" sortable>
                     <template #body>
                         <Skeleton></Skeleton>
@@ -186,6 +204,7 @@ function filterSells() {
     store.dispatch("filterByDates",  date.value ).then((res) => {
         if (res.status === 200 && res.data)
             filteredSells.value = [...res.data];
+        else
        common.showValidationErrors(res,toast);
     }).catch(error => error).finally(()=>document.body.style.cursor = 'default');
 }

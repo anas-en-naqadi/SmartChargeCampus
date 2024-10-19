@@ -15,8 +15,10 @@ const adminActions = {
     async fetchClients({ commit }) {
         try {
             const response = await axiosClient.get("/client");
-            return response.data;
-        } catch (error) {
+            if (response && response.status === 200 && response.data) {
+                commit("SET_CLIENTS", response.data);
+                return response.data;
+            }        } catch (error) {
             return error;
         }
     },
@@ -84,6 +86,20 @@ const adminActions = {
             return err;
         }
     },
+    async storeSell({ commit }, {sell,client,products}) {
+        try {
+            const payload = {
+                ...sell,
+                client,
+                products
+            };
+
+            const res = await axiosClient.post("/sell", payload);
+            return res;
+        } catch (err) {
+            return err;
+        }
+    },
 
     async updatePassword({ commit }, passwordBag) {
         try {
@@ -107,7 +123,7 @@ const adminActions = {
 
     async getWeeklySales() {
         try {
-            const response = await axiosClient.get("/weeklySales");
+            const response = await axiosClient.get("/weekly-sales");
             return response.data;
         } catch (error) {
             return error;
@@ -123,7 +139,7 @@ const adminActions = {
     },
     async getMonthlySales() {
         try {
-            const response = await axiosClient.get("/monthlySales");
+            const response = await axiosClient.get("/monthly-sales");
             return response.data;
         } catch (error) {
             return error;
@@ -147,7 +163,7 @@ const adminActions = {
     },
     async fetchLastClients() {
         try {
-            const response = await axiosClient.get("/last-clients");
+            const response = await axiosClient.get("/latest-clients");
             return response.data;
         } catch (error) {
             return error;
@@ -155,7 +171,7 @@ const adminActions = {
     },
     async fetchLastSells() {
         try {
-            const response = await axiosClient.get("/last-sells");
+            const response = await axiosClient.get("/latest-sells");
             return response.data;
         } catch (error) {
             return error;
@@ -173,7 +189,7 @@ const adminActions = {
 
     async getSells() {
         try {
-            const response = await axiosClient.get("/sells");
+            const response = await axiosClient.get("/sell");
             return response.data;
         } catch (error) {
             return error;
@@ -183,6 +199,26 @@ const adminActions = {
         try {
             const response = await axiosClient.get("/notifications");
             return response.data;
+        } catch (error) {
+            return error;
+        }
+    },
+    async register({ commit }, form) {
+        return await axiosClient
+            .post("/register", form)
+            .then((res) => {
+                commit("SET_USER", res.data.user);
+                sessionStorage.setItem("TOKEN", res.data.token);
+                return res;
+            })
+            .catch((error) => {
+                return error;
+            });
+    },
+    async deleteNotifications() {
+        try {
+            const response = await axiosClient.get("/delete-notifications");
+            return response;
         } catch (error) {
             return error;
         }

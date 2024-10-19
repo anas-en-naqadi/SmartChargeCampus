@@ -118,14 +118,10 @@ function register() {
                 document.querySelector("#success").classList.remove("hidden");
 
                 setTimeout(() => {
-                    if (res.data.is_admin)
                         router.push({
                             name: "dashboard",
                         });
-                    else
-                        router.push({
-                            name: "home",
-                        });
+
                 }, 1300);
             }
 
@@ -135,9 +131,8 @@ function register() {
             }
 
         })
-        .catch((err) => {
-            loading.value = false;
-
-        });
+        .catch((err) =>
+            loading.value = false
+        );
 }
 </script>

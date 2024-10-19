@@ -8,18 +8,18 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class StockAlertNotification extends Notification
+class ExpirationDateNotification extends Notification
 {
     use Queueable;
 
-    private Product $details ;
+    private Product $product ;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct(Product $details)
+    public function __construct(Product $product)
     {
-        $this->details = $details;
+            $this->product = $product;
     }
 
     /**
@@ -33,6 +33,7 @@ class StockAlertNotification extends Notification
     }
 
 
+
     /**
      * Get the array representation of the notification.
      *
@@ -41,8 +42,10 @@ class StockAlertNotification extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-'message' => "كمية المنتج <span style='font-weight: bold; color: red;'>{$this->details->name}</span> أقل من 10، يرجى التحقق منها",
+'message' => "كمية المنتج <span style='font-weight: bold; color: red;'>{$this->product->name}</span> أقل من 10، يرجى التحقق منها",
             'url' => "products"
         ];
+
+
     }
 }

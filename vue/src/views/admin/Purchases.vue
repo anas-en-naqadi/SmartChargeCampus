@@ -46,7 +46,7 @@
                         <span> {{ data.transporter_name }}</span>
                     </template>
                 </Column>
-                <Column field="" header="الفئة" class="border-b-[1px] text-center">
+                <Column field="" header="الفئة" class="border-b-[1px] text-center" sortable>
                     <template #body="{ data }">
                         <span> {{ data.category_name }}</span>
                     </template>
@@ -123,7 +123,7 @@
                         <Skeleton></Skeleton>
                     </template>
                 </Column>
-                <Column field="" header="الفئة" class="border-b-[1px] text-center">
+                <Column field="" header="الفئة" class="border-b-[1px] text-center" sortable>
                     <template #body>
                         <Skeleton></Skeleton>
                     </template>
@@ -133,12 +133,12 @@
                         <Skeleton></Skeleton>
                     </template>
                 </Column>
-                <Column field="price" header="سعر الشراء" class="border-b-[1px] text-center">
+                <Column field="price" header="سعر الشراء" class="border-b-[1px] text-center" sortable>
                     <template #body>
                         <Skeleton></Skeleton>
                     </template>
                 </Column>
-                <Column class="border-b-[1px] text-center" field="" header="سعر البيع">
+                <Column class="border-b-[1px] text-center" field="" header="سعر البيع" sortable>
                     <template #body>
                         <Skeleton></Skeleton>
                     </template>
@@ -470,8 +470,10 @@ function filterTable(event) {
     else
         filteredPurchases.value = purchases.value.filter(
             (p) =>
-                p.description.toLowerCase().includes(filter) ||
-                p.product_name.toLowerCase().includes(filter)
+                p.transporter_name.toLowerCase().includes(filter) ||
+                p.name.toLowerCase().includes(filter) ||
+                p.category_name.toLowerCase().includes(filter)
+
         );
 }
 

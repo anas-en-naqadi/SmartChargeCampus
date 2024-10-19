@@ -1,57 +1,26 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Services;
 
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use App\Models\User;
-use App\Models\Order;
+use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use App\Models\Sell;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Redis;
 
-class DashboardController extends Controller
+class DashboardService
 {
-    private const colors = [
-        'rgba(255, 99, 132, 0.2)',
-        'rgba(255, 159, 64, 0.2)',    // February
-        'rgba(255, 205, 86, 0.2)',    // March
-        'rgba(75, 192, 192, 0.2)',    // April
-        'rgba(54, 162, 235, 0.2)',    // May
-        'rgba(153, 102, 255, 0.2)',   // June
-        'rgba(201, 203, 207, 0.2)',   // July
-      'rgba(153, 102, 255, 0.2)',   // June
-    'rgba(201, 203, 207, 0.2)',   // July
-    'rgba(106, 90, 205, 0.2)',    // August (New color)
-    'rgba(255, 165, 0, 0.2)',     // September (New color)
-    'rgba(30, 144, 255, 0.2)',
-    ];
 
-    private const borderColors = [
-        'rgb(255, 99, 132)',    // January
-        'rgb(255, 159, 64)',    // February
-        'rgb(255, 205, 86)',    // March
-        'rgb(75, 192, 192)',    // April
-        'rgb(54, 162, 235)',    // May
-        'rgb(153, 102, 255)',   // June
-        'rgb(201, 203, 207)',   // July
-      'rgba(153, 102, 255, 0.2)',   // June
-    'rgba(201, 203, 207, 0.2)',   // July
-    'rgba(106, 90, 205, 0.2)',    // August (New color)
-    'rgba(255, 165, 0, 0.2)',     // September (New color)
-    'rgba(30, 144, 255, 0.2)',
-    ];
+    public function __construct() {}
 
 
-
-
-    public function getStockByCategory()
+    public function stockByCategory()
     {
         $cacheKey = 'stock_by_category';
         $cacheData = getCachedData($cacheKey, function () {
-        $stockAndProductCountByCategory = Product::join('categories', 'products.category_id', '=', 'categories.id')
+        $stockAndProductCountByCategory = getSimpleUser()->products()->join('categories', 'products.category_id', '=', 'categories.id')
             ->select(DB::raw('categories.category_name as category_name, SUM(products.stock_quantity) as total_stock, COUNT(products.id) as product_count'))
             ->groupBy('categories.category_name')
             ->get();
@@ -81,48 +50,18 @@ class DashboardController extends Controller
             ],
         ];
     });
-    return response()->json($cacheData);
+    return $cacheData;
     }
 
-//     public function getMonthlySales()
-// {
-//     $cacheKey = 'monthly_sales';
-//     $cacheData = getCachedData($cacheKey, function () {
-//         // Get the first and last day of the current month
-//         $firstDayOfMonth = Carbon::now()->startOfMonth()->toDateString();
-//         $lastDayOfMonth = Carbon::now()->endOfMonth()->toDateString();
-
-//         // Query to retrieve daily sales data for the current month
-//         $dailySales = Sell::whereBetween('created_at', [$firstDayOfMonth, $lastDayOfMonth])
-//             ->selectRaw('DATE(created_at) as date, SUM(total_price) as total_sales')
-//             ->groupBy('date')
-//             ->orderBy('date')
-//             ->get();
-
-//         // Prepare the response data
-//         $labels = $dailySales->map(function ($sale) {
-//             return Carbon::parse($sale->date)->format('d/M'); // Format 'date' to get day/month
-//         })->toArray();
-//         $data = $dailySales->pluck('total_sales')->toArray(); // Sales amount for each day
-
-//         return [
-//             'labels' => $labels,
-//             'data' => $data,
-//             'colors' => Self::colors,         // Assuming Self::colors is defined somewhere with your color array
-//             'borderColors' => Self::borderColors // Assuming Self::borderColors is defined somewhere with your border color array
-//         ];
-//     });
-
-//     return response()->json($cacheData);
-// }
 
 
     public function dashboardData()
     {
+
         $cacheKey = 'dashboard_data';
         $cacheData = getCachedData($cacheKey, function () {
             // Calculate total revenue for today from all sales
-            $todayMoney = Sell::whereDate('created_at', today())
+            $todayMoney = getSimpleUser()->sells()->whereDate('created_at', today())
                 ->with('products')
                 ->get()
                 ->sum(function ($sell) {
@@ -188,24 +127,19 @@ class DashboardController extends Controller
                 'salesWeekChange' => $weekSalesPercentageChange, // Added weekly sales percentage change
             ];
         });
-
-        return response()->json($cacheData);
+        return $cacheData;
     }
 
-
-
-
-
-    public function weeklySalesChart()
+    public function weeklySales($colors,$borderColors)
     {
         $cacheKey = 'weekly_sales';
-        $cacheData = getCachedData($cacheKey, function () {
+        $cacheData = getCachedData($cacheKey, function () use($colors,$borderColors) {
             // Get the current week's start and end dates
             $startOfWeek = Carbon::now()->startOfWeek();
             $endOfWeek = Carbon::now()->endOfWeek();
 
             // Query the database to get weekly sales data
-            $weeklySales = Sell::whereBetween('created_at', [$startOfWeek, $endOfWeek])
+            $weeklySales = getSimpleUser()->sells()->whereBetween('created_at', [$startOfWeek, $endOfWeek])
                 ->selectRaw('DAYNAME(created_at) as day_name, SUM(total_price) as total_sales')
                 ->groupBy('day_name')
                 ->orderByRaw('FIELD(day_name, "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")')
@@ -245,90 +179,19 @@ class DashboardController extends Controller
 
             $data = array_values($salesData);
 
-            return ['labels' => $labels, 'data' => $data, 'colors' => Self::colors, 'borderColors' => Self::borderColors];
+            return ['labels' => $labels, 'data' => $data, 'colors' =>$colors, 'borderColors' => $borderColors];
         });
-
-        return response()->json($cacheData);
+        return $cacheData;
     }
 
-
-
-
-
-
-    public function monthlySalesChart()
-    {
-        $cacheKey = 'monthly_sales_Chart';
-        $cacheData = getCachedData($cacheKey, function () {
-            // Get the current year
-            $currentYear = Carbon::now()->year;
-
-            // Query the database to get monthly sales data for the current year
-            $monthlySales = Sell::whereYear('created_at', $currentYear)
-                ->selectRaw('MONTHNAME(created_at) as month_name, SUM(total_price) as total_sales')
-                ->groupByRaw('MONTHNAME(created_at)')
-                ->orderByRaw('MONTH(created_at)')
-                ->get();
-
-            // Initialize sales data for all twelve months to 0
-            $salesData = [
-                'January' => 0,
-                'February' => 0,
-                'March' => 0,
-                'April' => 0,
-                'May' => 0,
-                'June' => 0,
-                'July' => 0,
-                'August' => 0,
-                'September' => 0,
-                'October' => 0,
-                'November' => 0,
-                'December' => 0,
-            ];
-
-            // Fill in the actual sales data for months where sales exist
-            foreach ($monthlySales as $sale) {
-                $salesData[$sale->month_name] = $sale->total_sales;
-            }
-
-            // Arabic translation for months of the year
-            $arabicMonths = [
-                'January' => 'يناير',
-                'February' => 'فبراير',
-                'March' => 'مارس',
-                'April' => 'أبريل',
-                'May' => 'مايو',
-                'June' => 'يونيو',
-                'July' => 'يوليو',
-                'August' => 'أغسطس',
-                'September' => 'سبتمبر',
-                'October' => 'أكتوبر',
-                'November' => 'نوفمبر',
-                'December' => 'ديسمبر',
-            ];
-
-            // Map the labels to Arabic
-            $labels = array_map(function($month) use ($arabicMonths) {
-                return $arabicMonths[$month];
-            }, array_keys($salesData));
-
-            $data = array_values($salesData);
-
-            return ['labels' => $labels, 'data' => $data, 'colors' => Self::colors, 'borderColors' => Self::borderColors];
-        });
-
-        return response()->json($cacheData);
-    }
-
-    public function monthlyRemaining()
-    {
+    public function monthlyRemaining($colors,$borderColors){
         $cacheKey = 'monthly_remaining_amount';
-        $cacheData = getCachedData($cacheKey, function () {
+        $cacheData = getCachedData($cacheKey, function () use($colors,$borderColors) {
             // Get the current year
             $currentYear = Carbon::now()->year;
 
             // Query the database to get monthly sales data for the current year
-            $monthlySales = Sell::whereYear('created_at', $currentYear)
+            $monthlySales = getSimpleUser()->sells()->whereYear('created_at', $currentYear)
                 ->selectRaw('MONTHNAME(created_at) as month_name, SUM(remaining_amount) as total_sales')
                 ->groupByRaw('MONTHNAME(created_at)')
                 ->orderByRaw('MONTH(created_at)')
@@ -378,14 +241,70 @@ class DashboardController extends Controller
 
             $data = array_values($salesData);
 
-            return ['labels' => $labels, 'data' => $data, 'colors' => Self::colors, 'borderColors' => Self::borderColors];
+            return ['labels' => $labels, 'data' => $data, 'colors' => $colors, 'borderColors' => $borderColors];
         });
-
-        return response()->json($cacheData);
+        return $cacheData;
     }
-    public function latestSells(){
-        $sells = Sell::latest()->limit(8)->get();
-        return response()->json($sells);
-}
-}
 
+    public function monthlySales($colors,$borderColors){
+        $cacheKey = 'monthly_sales_Chart';
+        $cacheData = getCachedData($cacheKey, function () use($colors,$borderColors) {
+            // Get the current year
+            $currentYear = Carbon::now()->year;
+
+            // Query the database to get monthly sales data for the current year
+            $monthlySales = getSimpleUser()->sells()->whereYear('created_at', $currentYear)
+                ->selectRaw('MONTHNAME(created_at) as month_name, SUM(total_price) as total_sales')
+                ->groupByRaw('MONTHNAME(created_at)')
+                ->orderByRaw('MONTH(created_at)')
+                ->get();
+
+            // Initialize sales data for all twelve months to 0
+            $salesData = [
+                'January' => 0,
+                'February' => 0,
+                'March' => 0,
+                'April' => 0,
+                'May' => 0,
+                'June' => 0,
+                'July' => 0,
+                'August' => 0,
+                'September' => 0,
+                'October' => 0,
+                'November' => 0,
+                'December' => 0,
+            ];
+
+            // Fill in the actual sales data for months where sales exist
+            foreach ($monthlySales as $sale) {
+                $salesData[$sale->month_name] = $sale->total_sales;
+            }
+
+            // Arabic translation for months of the year
+            $arabicMonths = [
+                'January' => 'يناير',
+                'February' => 'فبراير',
+                'March' => 'مارس',
+                'April' => 'أبريل',
+                'May' => 'مايو',
+                'June' => 'يونيو',
+                'July' => 'يوليو',
+                'August' => 'أغسطس',
+                'September' => 'سبتمبر',
+                'October' => 'أكتوبر',
+                'November' => 'نوفمبر',
+                'December' => 'ديسمبر',
+            ];
+
+            // Map the labels to Arabic
+            $labels = array_map(function($month) use ($arabicMonths) {
+                return $arabicMonths[$month];
+            }, array_keys($salesData));
+
+            $data = array_values($salesData);
+
+            return ['labels' => $labels, 'data' => $data, 'colors' => $colors, 'borderColors' => $borderColors];
+        });
+        return $cacheData;
+    }
+}

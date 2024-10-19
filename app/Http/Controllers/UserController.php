@@ -8,11 +8,9 @@ use App\Mail\SendPasswordMail;
 use App\Models\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Exception;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redis;
-use Illuminate\Support\Facades\URL;
 
 
 class UserController extends Controller

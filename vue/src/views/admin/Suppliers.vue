@@ -12,7 +12,7 @@
 
         <!-- Main Data Table -->
         <div v-if="!loading">
-            <DataTable :value="filteredSuppliers" removableSort :paginator="true" class="p-datatable-sites -mt-5 m-6"
+            <DataTable :value="filteredSuppliers" v-model:expandedRows="expandedRows" @rowExpand="totalOwn" removableSort :paginator="true" class="p-datatable-sites -mt-5 m-6"
                 showGridlines :rows="10" dataKey="id" tableStyle="min-width: 30rem" stripedRows
                 :rowClassName="'border-t text-center border-gray-200'" filterDisplay="menu" :loading="loading"
                 responsiveLayout="scroll" breakpoint="960px"
@@ -34,9 +34,11 @@
                 <template #empty>لا يوجد موردون</template>
 
                 <!-- Columns -->
+                <Column expander style="width: 5rem" />
+
                 <Column field="name" header="إسم المورد" class="border-b-[1px] text-center"></Column>
                 <Column field="phone" header="رقم الهاتف" class="border-b-[1px] text-center"></Column>
-                <Column field="cni" header="رقم البطاقة" class="border-b-[1px] text-center" sortable></Column>
+                <Column field="cni" header="رقم البطاقة" class="border-b-[1px] text-center" ></Column>
                 <Column field="purchase_count" header="عدد المشتريات" class="border-b-[1px] text-center" sortable>
                 </Column>
                 <Column field="total_credit" header="مجموع الدين " class="border-b-[1px] text-center" sortable>
@@ -44,7 +46,105 @@
                         <span>{{ common.formatNumber(data.total_credit) }}درهم</span>
                     </template>
                 </Column>
+                <template #expansion="{ data }">
+                    <div class="p-2.5">
 
+                        <div :class="[
+                            data.purchases.length ? 'mb-4' : '-mb-10',
+                            'flex',
+                            'justify-between',
+                            'items-center',
+                            '-mt-6',
+
+                        ]">
+
+                            <p class="mb-4 text-2xl flex font-extrabold p-8">
+
+
+                                <span class="text-2xl font-bold text-blue-800">{{ common.formatNumber(data.total_credit)
+                                    }}
+                                    درهم</span>
+                                <span class="ml-1"> : إجمالي الدين</span>
+                            </p>
+                            <p class="mb-4 text-2xl flex font-extrabold p-8">
+
+
+                                <span class="text-2xl font-bold text-blue-800">{{ common.formatNumber(TotalBought) }}
+                                    درهم</span>
+                                <span class="ml-1">: مجموع المشتريات
+                                </span>
+                            </p>
+                        </div>
+                        <DataTable v-if="data.purchases.length"  :value="data.purchases" removableSort :paginator="true" class="p-datatable-sites -mt-5 m-6"
+                showGridlines :rows="10" dataKey="id" tableStyle="min-width: 30rem" stripedRows
+                :rowClassName="'border-t text-center border-gray-200'" filterDisplay="menu" :loading="loading"
+                responsiveLayout="scroll" breakpoint="960px"
+                paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+                currentPageReportTemplate="عرض {first} إلى {last} من أصل {totalRecords} منتجًا">
+
+                <template #empty>لم يتم العثور على المشتريات</template>
+
+                <Column field="" header="إسم المنتج" class="border-b-[1px] text-center">
+                    <template #body="{ data }">
+                        <span> {{ data.name }}</span>
+                    </template>
+                </Column>
+                <Column field="" header="المورد" class="border-b-[1px] text-center">
+                    <template #body="{ data }">
+                        <span> {{ data.transporter_name }}</span>
+                    </template>
+                </Column>
+                <Column field="" header="الفئة" class="border-b-[1px] text-center">
+                    <template #body="{ data }">
+                        <span> {{ data.category_name }}</span>
+                    </template>
+                </Column>
+                <Column field="" header="الكمية" class="border-b-[1px] text-center" sortable>
+                    <template #body="{ data }">
+                        <span> {{ common.formatNumber(data.stock_quantity) }} <span
+                                class="text-red-500">Pcs</span></span>
+                    </template>
+                </Column>
+                <Column field="price" header="سعر الشراء" class="border-b-[1px] text-center" sortable>
+                    <template #body="{ data }">
+                        <span> {{ common.formatNumber(data.purchase_price) }} درهم</span>
+                    </template>
+                </Column>
+
+                <Column sortable field="" class="border-b-[1px] text-center" header="تاريخ انتهاء الصلاحية">
+                    <template #body="{ data }">
+                        <span> {{ common.formatDate(data.expiration_date) ?? '-' }}</span>
+                    </template>
+                </Column>
+                <Column sortable field="" class="border-b-[1px] text-center" header="تاريخ الإنشاء">
+                    <template #body="{ data }">
+                        <span> {{ common.formatDate(data.created_at) }} </span>
+                    </template>
+                </Column>
+
+                <Column header="إجراءات" class="border-b-[1px] text-center">
+                    <template #body="{ data }">
+                        <div class="flex gap-3">
+                            <button title="Edit this product" @click="editPurchase(data.id)">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-green-500">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                                </svg>
+                            </button>
+                            <button title="Delete this product" @click="deletePurchase(data.id)">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-red-500">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                </svg>
+                            </button>
+                        </div>
+                    </template>
+                </Column>
+            </DataTable>
+                    </div>
+                </template>
                 <Column header="إجراءات" class="border-b-[1px] text-center">
                     <template #body="{ data }">
                         <div class="flex gap-3">
@@ -101,7 +201,7 @@
                         <Skeleton></Skeleton>
                     </template>
                 </Column>
-                <Column field="" header="رقم البطاقة" class="border-b-[1px] text-center" sortable>
+                <Column field="" header="رقم البطاقة" class="border-b-[1px] text-center" >
                     <template #body>
                         <Skeleton></Skeleton>
                     </template>
@@ -217,6 +317,9 @@ const toast = useToast();
 const visible1 = ref(false);
 const debt = ref("");
 const visible = ref(false);
+const expandedRows = ref([]);
+const TotalBought = ref(0);
+
 const loading = ref(true);
 let supplierId = 0;
 const loaderButton = ref(false);
@@ -228,7 +331,14 @@ const skeletonObjects = new Array(10);
 onMounted(() => {
     getSuppliers();
 });
+function totalOwn(event) {
+    TotalBought.value = 0
+    console.log(event)
+    const supplier = event.data;
+    TotalBought.value = supplier.purchases.reduce((acc, purchase) => acc + (parseFloat(purchase.purchase_price) * purchase.stock_quantity), 0);
+    console.log(TotalBought.value)
 
+}
 function updateSupplier() {
 
     loaderButton.value = true;

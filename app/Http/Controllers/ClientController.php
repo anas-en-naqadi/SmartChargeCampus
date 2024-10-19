@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Client;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Http\Resources\ClientResource;
+
 
 class ClientController extends Controller
 {
@@ -14,10 +13,10 @@ class ClientController extends Controller
         $cacheKey = 'clients';
         $cachedData = getCachedData($cacheKey, function () {
             $clients = getSimpleUser()->clients()
-                ->with(['sells' => function ($query) {
-                    $query->with('client');
-                }])->get();
-            return $clients; // Return the processed clients
+            ->with(['sells']) // Eager load the 'sells' relationship
+            ->latest() // Sort by the latest creation date
+            ->get();
+            return ClientResource::collection($clients); // Return the processed clients
         });
 
         return response()->json($cachedData);
@@ -25,16 +24,6 @@ class ClientController extends Controller
 
 
 
-    // public function update(ClientRequest $request){
-    //     try {
-    //         $validatedData = $request->validated();
-    //         $validatedData['user_id']=getSimpleUser()?->id;
-    //         $client = Client::create($validatedData);
-
-    //         return response()->json(['message'=>''], 200);
-    //     } catch (\Exception $e) {
-    //         return response()->json(['error' => $e->getMessage()], 500);
-    //     }
-    // }
+   
 
 }

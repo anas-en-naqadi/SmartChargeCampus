@@ -1,28 +1,41 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\SellRequest;
 use App\Http\Resources\SellResource;
+use App\Models\Client;
+use App\Models\Product;
 use App\Models\Sell;
+use App\Models\SellProduct;
+use App\Services\SellService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Redis;
 
 class SellController extends Controller
 {
+    private $sellService;
 
-    public function sells(){
-        $cacheKey = 'sells';
-        $cacheData = getCachedData($cacheKey, function () {
-        $sells = Sell::latest()->with("client")->get();
-        return SellResource::collection($sells);
-    });
-    return response()->json($cacheData);
+    public function __construct(SellService $sellService) {
+        $this->sellService = $sellService;
     }
 
-    public function filterSellsByDates(Request $request){
+
+    public function index()
+    {
+        $cacheKey = 'sells';
+        $cacheData = getCachedData($cacheKey, function () {
+            $sells = getSimpleUser()->sells()->latest()->get();
+            return SellResource::collection($sells);
+        });
+        return response()->json($cacheData);
+    }
+
+    public function filterSellsByDates(Request $request)
+    {
         $data = $request->validate([
             'start_date' => 'required|date|before_or_equal:end_date',
             'end_date' => 'required|date|after_or_equal:start_date',
@@ -35,8 +48,18 @@ class SellController extends Controller
             'end_date.after_or_equal' => 'يجب أن يكون تاريخ الانتهاء بعد أو يساوي تاريخ البدء.',
         ]);
         $sells = Sell::whereBetween('created_at', [$data['start_date'], $data['end_date']])->get();
-          return response()->json(SellResource::collection($sells),200);
-       }
+        return response()->json(SellResource::collection($sells), 200);
+    }
 
-      
+    public function store(SellRequest $request)
+    {
+        $result = $this->sellService->storeSell($request);
+
+        if($result)
+        return response()->json(['message' => 'تمت عملية البيع بنجاح '], 201);
+    else
+     return response()->json(['message' => 'Failed to create sale.'], 500);
+
+    }
+
 }

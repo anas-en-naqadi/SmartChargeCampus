@@ -554,7 +554,6 @@ const options = {
 }
 const stockStatistics = ref({});
 const monthlySales = ref({});
-const userRegistrations = ref({});
 onMounted(() => {
 
     fetchMonthlySales();
@@ -562,8 +561,7 @@ onMounted(() => {
     getLastClients();
     getLastSells();
     fetchDashboardDetails();
-    // fetchSellstatus();
-    // fetchThisMonthSales();
+
     getMonthlyRemaining();
          fetchStockAnalytics();
 
@@ -582,11 +580,7 @@ function fetchStockAnalytics() {
         stockStatistics.value = res;
     });
 }
-function fetchUserRegistration() {
-    store.dispatch("getUserRegistrations").then((res) => {
-        userRegistrations.value = res;
-    });
-}
+
 function fetchWeeklySales() {
     store.dispatch("getWeeklySales").then((res) => {
         weeklySales.value = res;
@@ -598,12 +592,7 @@ function fetchMonthlySales() {
         monthlySales.value = res;
     });
 }
-function fetchOrderStatus() {
-    store.dispatch("getOrdersStatus").then((res) => {
-        orderStatus.value = res;
-        loading.value = false;
-    });
-}
+
 function fetchDashboardDetails() {
     store.dispatch("getDashboardData").then((res) => {
         statistics.value = res;

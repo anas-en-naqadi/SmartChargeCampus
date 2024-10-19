@@ -2,25 +2,23 @@
 
 namespace App\Notifications;
 
+use App\Models\Sell;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class NewOrderNotification extends Notification
+class CheckPushDateNotification extends Notification
 {
     use Queueable;
 
-    protected $order ;
-    protected $user;
-
+    private Sell $product;
     /**
      * Create a new notification instance.
      */
-    public function __construct($order,$user)
+    public function __construct(Sell $product)
     {
-            $this->order = $order ;
-            $this->user = $user;
+        $this->product = $product;
     }
 
     /**
@@ -43,10 +41,8 @@ class NewOrderNotification extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            'order_id' => $this->order['id'],
-            'name' => $this->user['name'],
-            'url' => '/admin/orders/'.$this->order['id']
+'message' => "<span style='font-weight: bold; color: red;'>{$this->product->client->name}</span> يجب عليك دفع الشيك للبنك غدا بإسم الزبون",
+            'url' => "sells"
         ];
-
     }
 }

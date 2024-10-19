@@ -9,6 +9,7 @@ const store = createStore({
         purchases:{},
         expenses:{},
         categories:{},
+        clients:{},
         user: {
             data: {},
             token: sessionStorage.getItem("TOKEN"),
@@ -22,6 +23,10 @@ const store = createStore({
         SET_PRODUCTS(state, products) {
             // Update the products state with the received data
             state.products = products;
+        },
+        SET_CLIENTS(state, clients) {
+            // Update the clients state with the received data
+            state.clients = clients;
         },
         SET_CATEGORIES(state, categories) {
             // Update the categories state with the received data

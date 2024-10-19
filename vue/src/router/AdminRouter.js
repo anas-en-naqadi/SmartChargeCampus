@@ -40,14 +40,14 @@ export default [
                 component: () => import("@/views/admin/Products.vue"),
             },
 
-        
+
             {
-                path: "/admin/invoices",
-                name: "invoices",
+                path: "/admin/menu",
+                name: "new-sale",
                 meta: {
-                    title: "Invoices - Admin",
+                    title: "Menu - Admin",
                 },
-                component: () => import("@/views/admin/invoice/Invoices.vue"),
+                component: () => import("@/views/admin/NewSale.vue"),
             },
             {
                 path: "/admin/sells",
@@ -66,33 +66,8 @@ export default [
                 component: () => import("@/views/admin/AllProducts.vue"),
             },
 
-            {
-                path: "/admin/invoice/show/:id(\\d+)",
-                name: "invoice-details",
-                meta: {
-                    title: "Invoice_Details - Admin",
-                },
-                component: () =>
-                    import("@/views/admin/invoice/InvoiceDetails.vue"),
-            },
-            {
-                path: "/admin/invoice/create",
-                name: "action-invoice",
-                meta: {
-                    title: "New Invoice - Admin",
-                },
-                component: () =>
-                    import("@/views/admin/invoice/ActionInvoice.vue"),
-            },
-            {
-                path: "/admin/invoice/:id(\\d+)/edit",
-                name: "edit-invoice",
-                meta: {
-                    title: "Edit Invoice - Admin",
-                },
-                component: () =>
-                    import("@/views/admin/invoice/ActionInvoice.vue"),
-            },
+         
+
             {
                 path: "/admin/categories",
                 name: "categories",

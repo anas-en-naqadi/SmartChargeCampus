@@ -41,7 +41,7 @@
 
                 <Column field="category" header="الفئة" class="border-b-[1px] text-center" sortable>
                     <template #body="{ data }">
-                        <span> {{ data.category.category_name }}</span>
+                        <span> {{ data.category_name }}</span>
                     </template>
                 </Column>
                 <Column field="stock_quantity" header="الكمية" class="border-b-[1px] text-center" sortable>

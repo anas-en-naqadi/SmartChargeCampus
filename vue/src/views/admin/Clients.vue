@@ -1,5 +1,3 @@
-
-
 <template>
     <div class="card mx-5 mt-12 bg-white border border-gray-300 rounded-xl">
         <div class="flex justify-between items-center mb-4">
@@ -39,38 +37,39 @@
                 <Column field="phone" class="border-b-[1px] w-[5rem] text-center" header="رقم الهاتف">
                 </Column>
 
-                <Column field="created_at" class="border-b-[1px] text-center w-full m-auto " header="أضيف في"  sortable>
+                <Column field="created_at" class="border-b-[1px] text-center w-full m-auto " header="أضيف في" sortable>
                     <template #body="{ data }">
                         <span>{{ common.formatDate(data.created_at) }}</span>
                     </template>
                 </Column>
 
-                <template #expansion="{data}">
+                <template #expansion="{ data }">
                     <div class="p-2.5">
 
                         <div :class="[
-    data.sells.length ? 'mb-4' : '-mb-10' ,
-    'flex',
-    'justify-between',
-    'items-center',
-    '-mt-6',
+                            data.sells.length ? 'mb-4' : '-mb-10',
+                            'flex',
+                            'justify-between',
+                            'items-center',
+                            '-mt-6',
 
-]">
+                        ]">
 
                             <p class="mb-4 text-2xl flex font-extrabold p-8">
 
 
-                                <span class="text-2xl font-bold text-blue-800">{{ common.formatNumber(total) }}
-                                    DH</span>
+                                <span class="text-2xl font-bold text-blue-800">{{ common.formatNumber(data.total_credit)
+                                    }}
+                                    درهم</span>
                                 <span class="ml-1"> : إجمالي الدين</span>
                             </p>
                             <p class="mb-4 text-2xl flex font-extrabold p-8">
 
 
                                 <span class="text-2xl font-bold text-blue-800">{{ common.formatNumber(TotalBought) }}
-                                    DH</span>
+                                    درهم</span>
                                 <span class="ml-1">: مجموع الحساب
-                                    </span>
+                                </span>
                             </p>
                         </div>
                         <DataTable v-if="data.sells.length" :value="data.sells" removableSort :paginator="true"
@@ -93,7 +92,7 @@
 
                                         <Button type="button" icon="pi pi-filter-slash" label="فلترة"
                                             class="p-button-outlined bg-white py-2 px-4 border border-green-500 rounded-md text-green-800 hover:text-white hover:bg-green-500"
-                                            @click="filterSells()" />
+                                            @click="filterSells(data.id)" />
                                     </div>
 
                                     <Button type="button" icon="pi pi-filter-slash" label="إزالة"
@@ -104,8 +103,8 @@
                             <template #empty>.لا توجد مبيعات</template>
                             <!-- Columns -->
                             <Column field="client" class="border-b-[1px] text-center" header="اسم الزبون">
-                                <template #body="{data}">
-                                    <span>{{ data.client.name }}</span>
+                                <template #body="{ data }">
+                                    <span>{{ data.client_name }}</span>
                                 </template>
                             </Column>
 
@@ -116,14 +115,19 @@
                                 </template>
                             </Column>
 
-                            <Column field="paid_price" header="الدفع" sortable>
+                            <Column field="paid_price" class="border-b-[1px] text-center" header="الدفع" sortable>
                                 <template #body="{ data }">
-                                    <span>{{ common.formatNumber(data.paid_price) }} درهم</span>
+                                    <span>{{ common.formatNumber(data.paid_amount) }} درهم</span>
                                 </template>
                             </Column>
                             <Column field="remaining_amount" class="border-b-[1px] text-center" header="الدين" sortable>
                                 <template #body="{ data }">
                                     <span>{{ common.formatNumber(data.remaining_amount) }} درهم</span>
+                                </template>
+                            </Column>
+                            <Column field="change" class="border-b-[1px] text-center" header="الصرف">
+                                <template #body="{ data }">
+                                    <span>{{ common.formatNumber(data.change) }} درهم</span>
                                 </template>
                             </Column>
                             <Column field="status" class="border-b-[1px] text-center" header="الحالة" sortable>
@@ -136,9 +140,11 @@
                                         {{ data.status }}
                                     </span> </template>
                             </Column>
-                            <Column field="check" class="border-b-[1px] text-center" header="الشيك" sortable>
+                            <Column field="" class="border-b-[1px] text-center" header="طريقة الدفع" sortable>
                                 <template #body="{ data }">
-                                    <span>{{ data.check ? "نعم" : "لا"}}</span>
+                                    <span
+                                        :class="['text-xs text-white rounded-md p-1.5 border', data.payment_method == 'نقدًا' ? 'bg-gray-500' : 'bg-sky-500']">{{
+                                        data.payment_method }}</span>
                                 </template>
                             </Column>
                             <Column field="check" class="border-b-[1px] text-center" header="تاريخ دفع الشيك" sortable>
@@ -147,27 +153,23 @@
                                 </template>
                             </Column>
 
-                            <Column header="الطباعة" class="border-b-[1px] text-center">
-                                <template #body="{ data }">
-                                    <div class="flex gap-3">
+                            <Column header="الطباعة" class=" border-b-[1px] text-center">
+                    <template #body="{ data }">
+                        <div class="flex gap-3">
 
-                                        <button title="Edit this product" @click="editProduct(data.id)">
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                                stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-green-500">
-                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                    d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
-                                            </svg>
-                                        </button>
-                                        <button title="Delete this product" @click="deleteProduct(data.id)">
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                                stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-red-500">
-                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                    d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </template>
-                            </Column>
+                            <button title="قم بتنزيل الإيصال"
+                                class="border border-blue-500 px-2 rounded-md text-blue-500"
+                                @click="editProduct(data.id)">
+                                Bon
+
+                            </button>
+                            <button class="border border-red-500 px-2 rounded-md text-red-500"
+                                title="قم بتنزيل الفاتورة" @click="deleteProduct(data.id)">
+                                Facture
+                            </button>
+                        </div>
+                    </template>
+                </Column>
                         </DataTable>
                     </div>
                 </template>
@@ -189,14 +191,16 @@
                             class="p-button-outlined bg-white py-2 px-4 border border-blue-500 rounded-md text-blue-800 hover:text-white hover:bg-blue-500" />
                     </div>
                 </template>
-                <Column field="name" header="إسم الزبون">
+                <Column expander style="width: 5rem" />
+
+                <Column field="name" class="border-b-[1px] w-[5rem] text-center" header="إسم الزبون">
                     <template #body>
                         <Skeleton></Skeleton>
                     </template>
                 </Column>
                 <Column field="cni" class="border-b-[1px] w-[5rem] text-center" header="رقم بطاقة الهوية ">
                     <template #body>
-                        <Skeleton></Skeleton>
+                        <Skeleton width="15rem"></Skeleton>
                     </template>
                 </Column>
                 <Column field="phone" headerStyle="text-align:center" class="border-b-[1px] text-center"
@@ -223,12 +227,10 @@
 
 <script setup>
 import store from "../../store";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import common from "../../utils/common";
 import { useToast } from "primevue/usetoast";
-const clients = ref([]);
-const user = ref({ is_admin: " ", name: "", email: "", phone: "" });
-const visible2 = ref(false);
+const clients = computed(() => store.state.clients);
 const loading = ref(false);
 
 const filteredClients = ref([]);
@@ -237,74 +239,64 @@ const expandedRows = ref([]);
 const toast = useToast();
 
 const date = ref({});
-const total = ref(0);
 const TotalBought = ref(0);
 onMounted(() => {
-  fetchClients();
+    fetchClients();
 });
-function totalOwn(event){
-    total.value =0;
+function totalOwn(event) {
     TotalBought.value = 0
     const user = event.data;
-    total.value = user.sells.reduce((acc, sell) => acc + sell.remaining_amount, 0);
-    TotalBought.value = user.sells.reduce((acc, sell) => acc + sell.total_price, 0);
+    TotalBought.value = user.sells.reduce((acc, sell) => acc + parseFloat(sell.total_price), 0);
 
 }
 function clearFilter() {
-  document.getElementById("searchInput").value = "";
-  filteredClients.value = clients.value;
+    document.getElementById("searchInput").value = "";
+    filteredClients.value = clients.value;
 }
 function fetchClients() {
-  loading.value = true;
-  store
-    .dispatch("fetchClients")
-    .then((res) => {
-      clients.value = res;
-      filteredClients.value = [...clients.value];
-    })
-    .catch((error) => console.error(error))
-    .finally(() => {
-      loading.value = false;
-    });
+    loading.value = true;
+    store
+        .dispatch("fetchClients")
+        .then((res) =>
+            filteredClients.value = res
+        )
+        .catch((error) => console.error(error))
+        .finally(() =>
+            loading.value = false
+        );
 }
 
 function filterTable(event) {
-  const filter = event.target.value.toLowerCase();
+    const filter = event.target.value.toLowerCase();
 
-  if (!filter) filteredClients.value = clients.value;
-  else
-    filteredClients.value = clients.value.filter(
-      (u) =>
-        u.cni.toLowerCase().includes(filter) ||
-        u.name.toLowerCase().includes(filter) ||
-        u.phone.toLowerCase().includes(filter)
-    );
+    if (!filter) filteredClients.value = clients.value;
+    else
+        filteredClients.value = clients.value.filter(
+            (c) =>
+                c.cni?.toLowerCase().includes(filter) ||
+                c.name?.toLowerCase().includes(filter) ||
+                c.phone?.toLowerCase().includes(filter)
+        );
 }
 
 
 
-
-
-function newUser() {
-  store.dispatch("storeUser",user.value).then((res) => {
-    console.log(res)
-    if (res.status === 200 && res.data) {
-      fetchClients();
-      visible2.value = false ;
-      common.showToast({ title: res.data.message, icon: "success" });
-    }
-    if (res.response && res.response.status === 422) {
-      [...Object.values(res.response.data.errors)].forEach((e) => {
-        toast.add({
-          severity: "error",
-          summary: "Error",
-          detail: e[0],
-          life: 3000,
-        });
-      });
-    }
-  });
+function filterSells(id) {
+    document.body.style.cursor = 'wait'
+    console.log(id)
+    store.dispatch("filterByDates", date.value).then((res) => {
+        if (res.status === 200 && res.data) {
+            const index = filteredClients.value.findIndex(c => c.id === id);
+            console.log("index",index  )
+            if (index !== -1)
+                filteredClients.value[index].sells = [...res.data];
+            TotalBought.value = filteredClients.value[index].sells.reduce((acc, sell) => acc + sell.total_price, 0);
+        } else
+            common.showValidationErrors(res, toast);
+    }).catch(error => error).finally(() => document.body.style.cursor = 'default');
 }
+
+
 // Define skeleton data
 const skeletonObjects = new Array(10);
 </script>

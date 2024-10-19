@@ -19,12 +19,12 @@ class SellFactory extends Factory
         return [
             'client_id' => \App\Models\Client::inRandomOrder()->first()->id,
             'user_id' => \App\Models\User::inRandomOrder()->first()->id,
-
+'change' => fake()->randomFloat(2, -1000, 0), // Generate a negative float
             'total_price' => fake()->randomFloat(2, 0, 1000),
             'paid_amount' => fake()->randomFloat(2, 0, 1000),
             'remaining_amount' => fake()->randomFloat(2, 0, 1000),
-            'status' => fake()->randomElement(["مدفوع", "غير مدفوع", "متبقي"]),
-            'check' => fake()->boolean(),
+            'status' => fake()->randomElement(["مدفوع", "متبقي"]),
+            'payment_method' => fake()->randomElement(["نقدًا", "كريدي"]),
         ];
     }
 }

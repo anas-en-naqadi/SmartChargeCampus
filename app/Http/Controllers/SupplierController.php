@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ClientRequest;
+use App\Http\Resources\PurchaseResource;
 use App\Models\Client;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -15,15 +16,16 @@ class SupplierController extends Controller
         $cacheKey = 'suppliers';
 
         $cachedData = getCachedData($cacheKey, function () {
-            $clients = getSimpleUser()->transporters->map(function ($query) {
+            $clients = getSimpleUser()->transporters()->latest()->get()->map(function ($query) {
                 return [
                     'id' => $query->id,
                     'name' => $query->name,
                     'phone' => $query->phone,
                     'cni' => $query->cni,
+                    'purchases' =>PurchaseResource::collection($query->purchases),
                     'purchase_count' => $query->sells()->count(),
                     'total_credit' => $query->total_credit,
-                    'created_at'=>$query->created_at
+                    'created_at' => $query->created_at
                 ];
             });
 

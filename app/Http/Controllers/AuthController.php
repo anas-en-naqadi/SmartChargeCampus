@@ -51,13 +51,13 @@ class AuthController extends Controller
         // Attempt to authenticate the user after registration
         if (Auth::attempt(['email' => $user->email, 'password' => $request->password], true)) {
             // If authentication after registration is successful, retrieve the authenticated user
-            $user = Auth::user()->load('defaultShippingAddress');
+            $user = getSimpleUser();
 
             // Create a new token for the user
             $token = $user->createToken('main')->plainTextToken;
 
             // Return user data and token
-            return response()->json(['user' => $user, 'token' => $token, 'is_admin' => $user->is_admin], 200);
+            return response()->json(['user' => $user, 'token' => $token], 200);
         } else {
             // If authentication after registration fails, return error message
             return response()->json(['error' => 'Authentication failed'], 401);

@@ -86,25 +86,26 @@ export default {
         let seconds = Math.floor((now - new Date(date)) / 1000);
         let interval = seconds / 31536000;
         if (interval > 1) {
-            return Math.floor(interval) + " years" + " ago";
+            return Math.floor(interval) + " سنوات" + " مضت";
         }
         interval = seconds / 2592000;
         if (interval > 1) {
-            return Math.floor(interval) + " months" + " ago";
+            return Math.floor(interval) + " أشهر" + " مضت";
         }
         interval = seconds / 86400;
         if (interval > 1) {
-            return Math.floor(interval) + " days" + " ago";
+            return Math.floor(interval) + " أيام" + " مضت";
         }
         interval = seconds / 3600;
         if (interval > 1) {
-            return Math.floor(interval) + " hours" + " ago";
+            return Math.floor(interval) + " ساعات" + " مضت";
         }
         interval = seconds / 60;
         if (interval > 1) {
-            return Math.floor(interval) + " minutes" + " ago";
+            return Math.floor(interval) + " دقائق" + " مضت";
         }
-        return Math.floor(seconds) + " seconds" + " ago";
+        return Math.floor(seconds) + " ثوانٍ" + " مضت";
+
     },
     capitalizeFirstLetter(string) {
         return string.charAt(0).toUpperCase() + string.slice(1);

@@ -22,8 +22,9 @@ class ProductResource extends JsonResource
             'purchase_price' => $this->purchase_price,
             'stock_quantity' => $this->stock_quantity,
             'image' => URL::to($this->image), // Transform the image field to a full URL
-            'category_name' => $this->category->category_Name,
+            'category_name' => $this->category?->category_name,
             'expiration_date' => $this->expiration_date,
+            'category_id' =>$this->category?->id,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

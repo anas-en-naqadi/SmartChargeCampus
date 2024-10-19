@@ -41,10 +41,8 @@
                 <Column field="name" header="إسم المنتج" class="border-b-[1px] text-center">
 
                 </Column>
-                <Column field="category" header="الفئة" class="border-b-[1px] text-center" sortable>
-                    <template #body="{ data }">
-                        <span> {{ data.category_name }}</span>
-                    </template>
+                <Column field="category_name" header="الفئة" class="border-b-[1px] text-center" sortable>
+
                 </Column>
                 <Column field="stock_quantity" header="الكمية" class="border-b-[1px] text-center" sortable>
 
@@ -254,7 +252,7 @@
                     </select>
                 </div>
                 <Buton :loading="loaderButton" :string="product.id ? 'تعديل' : 'إضافة'" @trigger-event="switchActions"
-                    :color="'blue'" />
+                    :color="'green'" />
 
 
             </form>
@@ -297,11 +295,9 @@ onMounted(() => {
 function make_changes(res) {
     visible.value = false;
     common.showToast({ title: res.data.message, icon: "success" });
-    console.log(res.data.product);
 
     if (product.value.id) {
         const index = filteredProducts.value.findIndex((p) => p.id === res.data.product.id);
-        console.log(index);
         if (index !== -1) {
             filteredProducts.value[index] = res.data.product;
         }
@@ -323,7 +319,7 @@ function make_changes(res) {
 }
 function updateProduct() {
 
-    loaderButton.value = false;
+    loaderButton.value = true;
     store
         .dispatch("updateProduct", {
             product: product.value,
@@ -355,10 +351,11 @@ function editProduct(id) {
                 product.value.name = res.data.name;
                 product.value.image = res.data.image;
                 product.value.selling_price = res.data.selling_price;
-                product.value.category_id = res.data.category.id;
+                product.value.category_id = res.data.category_id;
                 product.value.purchase_price = res.data.purchase_price;
                 product.value.stock_quantity = res.data.stock_quantity;
                 product.value.expiration_date = res.data.expiration_date;
+
                 document.body.style.cursor='default';
 
                 visible.value = true;

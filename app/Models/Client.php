@@ -23,7 +23,11 @@ class Client extends Model
         return $this->hasMany(Sell::class,'client_id');
     }
 
-    
+    public function purchases(){
+        return $this->hasMany(Purchase::class,'transporter_id');
+    }
+
+
 
 
 
