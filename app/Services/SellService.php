@@ -2,20 +2,19 @@
 
 namespace App\Services;
 
+use App\Http\Requests\SellRequest;
 use App\Models\Client;
-use App\Models\Invoice;
 use App\Models\Product;
 use App\Models\Sell;
 use App\Models\SellProduct;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Redis;
 
 class SellService
 {
     public function __construct() {}
 
-    public function storeSell(object $request)
+    public function storeSell(SellRequest $request)
     {
 
         try {

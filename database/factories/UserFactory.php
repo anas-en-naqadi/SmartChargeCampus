@@ -26,7 +26,7 @@ class UserFactory extends Factory
         $this->faker = \Faker\Factory::create('ar_SA');
         return [
             'name' => fake()->name(),
-            'email' => "admin@admin.com",
+            'email' => $this->faker->unique()->safeEmail,
             'phone' => fake()->unique()->phoneNumber(),
             'password' => Hash::make('admin@admin.com')
         ];

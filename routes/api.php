@@ -44,12 +44,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::controller(DashboardController::class)->group(function () {
         Route::get('/weekly-sales', 'weeklySalesChart');
         Route::get('/monthly-sales', 'monthlySalesChart');
-        Route::get('/this-month', 'getMonthlySales');
         Route::get('/month-remaining', 'monthlyRemaining');
-        Route::get('/user-registrations', 'monthlyUserRegistrations');
         Route::get('/stock-by-category', 'getStockByCategory');
         Route::get('/latest-sells', 'latestSells');
-
         Route::get('/dashboard-data', [DashboardController::class, 'dashboardData']);
     });
 

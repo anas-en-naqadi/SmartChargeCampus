@@ -1,6 +1,7 @@
 <?php
 namespace App\Services;
 
+use App\Http\Requests\PurchaseRequest;
 use App\Http\Resources\PurchaseResource;
 use App\Models\Product;
 use App\Models\Purchase;
@@ -11,7 +12,7 @@ class PurchaseService {
     public function __construct() {}
 
 
-    public function storePurchase(object $request){
+    public function storePurchase(PurchaseRequest $request){
         $validatedData = $request->validated();
         cleanInputs($validatedData);
 
@@ -22,7 +23,7 @@ class PurchaseService {
         return PurchaseResource::make($purchase);
     }
 
-    public function storeExistingPurchase(object $request){
+    public function storeExistingPurchase(PurchaseRequest $request){
 
         $validatedData = $request->validated();
         cleanInputs($validatedData);
@@ -42,7 +43,7 @@ class PurchaseService {
         return PurchaseResource::make($purchase);
     }
 
-    public function updatePurchase (object $request,Purchase $purchase){
+    public function updatePurchase (PurchaseRequest $request,Purchase $purchase){
         $validatedData = $request->validated();
         cleanInputs($validatedData);
 

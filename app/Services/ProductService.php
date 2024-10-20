@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Http\Requests\ProductRequest;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use Illuminate\Support\Facades\File;
@@ -13,7 +14,7 @@ class ProductService
     public function __construct() {}
 
 
-    public function storeProduct(object $request)
+    public function storeProduct(ProductRequest $request)
     {
         $validatedData = $request->validated();
         cleanInputs($validatedData);
@@ -33,7 +34,7 @@ class ProductService
 
 
 
-    public function updateProduct(object $request, Product $product)
+    public function updateProduct(ProductRequest $request, Product $product)
     {
 
         $validatedData['user_id'] = getSimpleUser();

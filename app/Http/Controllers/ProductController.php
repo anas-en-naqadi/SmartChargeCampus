@@ -51,8 +51,10 @@ class ProductController extends Controller
 
     public function show(Product $product)
     {
+        saveActivity($product, 'عرض تفاصيل المنتجات', 'عرض');
 
             return response()->json(ProductResource::make($product),200);
+
 
     }
 
