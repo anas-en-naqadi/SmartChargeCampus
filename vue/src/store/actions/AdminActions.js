@@ -33,6 +33,14 @@ const adminActions = {
             return error;
         }
     },
+    async fetchInvoiceById({commit},id){
+        try{
+            const response = await axiosClient.get("/sell/"+id);
+            return response;
+        }catch(error){
+            return error;
+        }
+    },
     async logout({ commit }) {
         return await axiosClient
             .post("/logout")
@@ -70,7 +78,18 @@ const adminActions = {
     },
     async updateAdminProfile({ commit }, user) {
         try {
-            const res = await axiosClient.post("/update-admin-profile", user);
+            const res = await axiosClient.post("/update-user-company", user);
+            console.log(res);
+            if (res.status === 200) commit("SET_USER", res.data.user);
+            return res;
+        } catch (err) {
+            return err;
+        }
+    },
+    async updateUserProfile({ commit }, user) {
+        try {
+            const res = await axiosClient.post("/update-user", user);
+            console.log(res);
             if (res.status === 200) commit("SET_USER", res.data.user);
             return res;
         } catch (err) {
@@ -187,10 +206,14 @@ const adminActions = {
         }
     },
 
-    async getSells() {
+    async getSells({commit}) {
         try {
             const response = await axiosClient.get("/sell");
-            return response.data;
+            if (response && response.status === 200 && response.data) {
+                commit("SET_SELLS", response.data);
+                console.log(response.data)
+                return response.data;
+            }
         } catch (error) {
             return error;
         }

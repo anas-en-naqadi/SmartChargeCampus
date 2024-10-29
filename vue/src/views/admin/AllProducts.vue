@@ -149,7 +149,7 @@ function filterTable(event) {
     else
         filteredProducts.value = products.value.filter(
             (p) => p.name.toLowerCase().includes(filter) ||
-            p.category.category_name.toLowerCase().includes(filter)
+            p.category_name.toLowerCase().includes(filter)
         );
 }
 

@@ -4,12 +4,13 @@ import Expenses from "../views/admin/Expenses.vue";
 
 const store = createStore({
     state: {
-        products: {},
-        suppliers: {},
-        purchases:{},
-        expenses:{},
-        categories:{},
-        clients:{},
+        products: [],
+        suppliers: [],
+        purchases:[],
+        expenses:[],
+        categories:[],
+        clients:[],
+        sells:[],
         user: {
             data: {},
             token: sessionStorage.getItem("TOKEN"),
@@ -23,6 +24,10 @@ const store = createStore({
         SET_PRODUCTS(state, products) {
             // Update the products state with the received data
             state.products = products;
+        },
+        SET_SELLS(state, sells) {
+            // Update the sells state with the received data
+            state.sells = sells;
         },
         SET_CLIENTS(state, clients) {
             // Update the clients state with the received data

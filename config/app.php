@@ -169,7 +169,8 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         Spatie\LaravelIgnition\IgnitionServiceProvider::class,
-        Mccarlosen\LaravelMpdf\LaravelMpdfServiceProvider::class
+        Baidouabdellah\LaravelArpdf\ArPDFServiceProvider::class,
+
     ])->toArray(),
 
     /*

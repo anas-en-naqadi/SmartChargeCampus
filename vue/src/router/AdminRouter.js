@@ -66,7 +66,7 @@ export default [
                 component: () => import("@/views/admin/AllProducts.vue"),
             },
 
-         
+
 
             {
                 path: "/admin/categories",
@@ -91,6 +91,22 @@ export default [
                     title: "Expenses - Admin",
                 },
                 component: () => import("@/views/admin/Expenses.vue"),
+            },
+            {
+                path: "/admin/settings",
+                name: "settings",
+                meta: {
+                    title: "Settings - Admin",
+                },
+                component: () => import("@/views/admin/Settings.vue"),
+            },
+            {
+                path: "/admin/invoice/:id",
+                name: "show-invoice",
+                meta: {
+                    title: "Invoice - Admin",
+                },
+                component: () => import("@/views/admin/invoice/InvoiceDetails.vue"),
             },
             {
                 path: "/admin/activities",

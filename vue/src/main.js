@@ -37,7 +37,6 @@ createApp(App)
     .component("FileUpload", FileUpload)
     .component("Galleria", Galleria)
     .component("Steps", Steps)
-
     .component("Dialog", Dialog)
     .component("Column", Column)
     .mount("#app");

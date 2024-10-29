@@ -171,7 +171,7 @@
 
                     <select v-model="purchase.updated_product" id="updated_product"
                         class="block p-2.5 px-0 w-full text-sm text-black bg-transparent border-0 border-b-2 border-gray-300 appearance-none white:text-gray-400 white:border-gray-700 focus:outline-none focus:ring-0 focus:border-gray-200 peer">
-                        <option selected>اختر المنتج</option>
+                        <option  :value="null" selected>اختر المنتج</option>
                         <option v-for="product in products" :value="product.id" :key="product.id">
                             {{ product.name }}
                         </option>
@@ -254,7 +254,7 @@
 <script setup>
 
 import { useToast } from "primevue/usetoast";
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed,watch } from "vue";
 import store from "../../store";
 import common from "../../utils/common";
 import Buton from "../../components/Button.vue";
@@ -274,7 +274,17 @@ const purchase = ref({
     category_id: 0,
 });
 const loading = ref(true);
-
+watch(visible1,(newVal)=>{
+    if(!newVal)
+    purchase.value = {
+        purchase_price: null,
+        expiration_date: null,
+        transporter_id: 0,
+        updated_product:null,
+        stock_quantity: null,
+        category_id: 0,
+    };
+})
 onMounted(() => {
     getPurchases();
     store.dispatch("fetchSuppliers");

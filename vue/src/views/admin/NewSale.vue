@@ -1,12 +1,12 @@
 <template>
-    <div class="flex -ml-[1rem]  w-full 2xl:flex-nowrap flex-wrap h-full gap-6 items-center justify-center">
+    <div class="flex -ml-[1rem] bg-red-500  w-full 2xl:flex-nowrap flex-wrap h-full items-center justify-center" id="content">
         <!-- products container -->
-        <div class="flex h-[130vh] flex-col border  w-full gap-6 mt-[2rem] rounded-md shadow-md bg-white p-6">
+        <div class="flex h-[130vh] flex-col border  w-full gap-6  rounded-md shadow-md bg-white m-8 p-6">
             <!-- search input-->
             <div>
 
-                <form class="max-w-lg mx-auto">
-                    <div class="flex">
+                <form class="max-w-lg mx-auto ">
+                    <div class="flex ">
 
                         <select @change="filterByCategory($event)" name="" id=""
                             class="flex-shrink-0 z-10 inline-flex items-center py-2.5 px-4 text-sm font-medium text-center text-gray-900 bg-gray-100 border border-gray-300 rounded-s-lg hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-100 white:bg-gray-700 white:hover:bg-gray-600 white:focus:ring-gray-700 white:text-white white:border-gray-600">
@@ -30,24 +30,24 @@
 
             </div>
             <!-- products grid -->
-            <div v-if="products.length"
-                class="grid grid-cols-2 overflow-y-auto overflow-x-hidden   sm:grid-cols-3 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4">
+            <div v-if="products.length > 0"
+                class="grid grid-cols-2 overflow-y-auto overflow-x-hidden   sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 p-4">
                 <button @click="addProductToCart(product.id)" v-for="(product, index) in filteredProducts" :key="index"
-                    class="bg-white rounded-lg shadow-xl flex w-48 h-auto flex-col items-center hover:bg-blue-100 transition duration-200 transform hover:scale-105">
-                    <img :src="product.image" class="w-48 h-36 object-cover  rounded-md" alt="Product Image" />
+                    class="bg-white rounded-lg shadow-xl flex border-2 border-gray-200  w-44 h-auto flex-col items-center hover:bg-blue-100 transition duration-200 transform hover:scale-105">
+                    <img :src="product.image" class="w-44 h-44  object-cover  rounded-md" alt="Product Image" />
                 </button>
             </div>
             <div v-else
                 class="grid grid-cols-2 overflow-y-auto overflow-x-hidden   sm:grid-cols-3 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4">
                 <button @click="addProductToCart(product.id)" v-for="(product, index) in filteredProducts" :key="index"
-                    class="bg-white rounded-lg shadow-xl flex w-48 h-auto flex-col items-center hover:bg-blue-100 transition duration-200 transform hover:scale-105">
-                    <Skeleton width="12rem" height="9rem"></Skeleton>
+                class="bg-white rounded-lg shadow-xl flex   w-44 h-auto mr-6 flex-col items-center hover:bg-blue-100 transition duration-200 transform hover:scale-105">
+                <Skeleton width="11rem" height="11rem"></Skeleton>
                 </button>
             </div>
         </div>
         <!--total container-->
         <div class="h-full">
-            <div class="font-sans md:max-w-4xl max-md:max-w-xl mx-auto w-[53vh] bg-white shadow-md border rounded-md py-4 mt-10">
+            <div class="font-sans md:max-w-4xl max-md:max-w-xl mx-auto w-[53vh] bg-white shadow-md border rounded-md py-2 mt-10 mr-8">
                 <div class="flex flex-col ">
                     <div class="md:col-span-2 bg-white p-4 rounded-md">
                         <h2 class="text-2xl font-bold text-gray-800">Cart</h2>
@@ -74,7 +74,7 @@
                                         <div class="flex gap-4 mt-4 w-full justify-between items-center">
 
                                             <button @click="deleteProductFromCart(product.id)"
-                                                class="text-xs text-red-500 cursor-pointer mt-0.5">Remove</button>
+                                                class="text-xs text-red-500 cursor-pointer mt-0.5 hover:underline">Remove</button>
 
                                             <div
                                                 class="flex items-center gap-2 text-center px-2.5 py-1.5 border border-gray-300 text-gray-800 text-xs outline-none bg-transparent rounded-md">
@@ -142,7 +142,7 @@
                                 <label for="debt"
                                     class="block mb-2 text-sm font-medium text-gray-900 white:text-white ml-auto">الدين
                                 </label>
-                                <input v-model="remaining_amount" type="text" id="debt"
+                                <input v-model="sell.remaining_amount" type="text" id="debt"
                                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 w-full focus:border-blue-500 block w-full p-2.5 white:bg-gray-700 white:border-gray-600 white:placeholder-gray-400 white:text-white white:focus:ring-blue-500 white:focus:border-blue-500"
                                     placeholder="John" required />
                             </div>
@@ -251,7 +251,7 @@
 
                                 <select v-model="sell.client_id" id="clients"
                                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 white:bg-gray-700 white:border-gray-600 white:placeholder-gray-400 white:text-white white:focus:ring-blue-500 white:focus:border-blue-500">
-                                    <option selected> الزبائن</option>
+                                    <option selected :value="null"> الزبائن</option>
                                     <option v-for="client in clients" :value="client.id" :key="client.id">{{ client.name
                                         }}
                                     </option>
@@ -261,10 +261,10 @@
 
 
 
-                        <div class="flex flex-wrap gap-4 text-base font-bold">Total <span class="ml-auto">{{
-                            common.formatNumber(sell.total_price) }} درهم</span></div>
-                               <div v-if="sell.remaining_amount <0" class="flex flex-wrap gap-4 text-base font-bold">Exchange <span class="ml-auto">{{
-                            common.formatNumber(remaining_amount) }} درهم</span></div>
+                        <div class="flex flex-wrap justify-between w-full text-base font-bold ml-auto"> <span >{{
+                            common.formatNumber(sell.total_price) }} درهم</span>المجموع</div>
+                               <div v-if="sell.change <0" class="flex flex-wrap gap-4 text-base font-bold">الصرف <span class="ml-auto">{{
+                            common.formatNumber(sell.change) }} درهم</span></div>
 
                         <Button @trigger-event="addNewSell()" string="إضافة" color="green" :loading="loaderButton"
                            />
@@ -284,6 +284,7 @@ import common from "../../utils/common";
 import Button from "../../components/Button.vue";
 import { computed, ref, onMounted, watch } from "vue";
 import { useToast } from "primevue/usetoast";
+import { useRouter } from "vue-router";
 const products = computed(() => store.state.products);
 const carts = ref([]);
 const toast = useToast();
@@ -304,6 +305,7 @@ const categories = computed(() => {
 
 const clients = computed(() => store.state.clients);
 const isClient = ref("");
+const router = useRouter();
 const filteredProducts = ref([]);
 watch(products, (newValue) => {
     filteredProducts.value = newValue;
@@ -326,10 +328,17 @@ watch(remaining_amount,(newValue)=>{
         sell.value.remaining_amount = Math.max(0,parseFloat(newValue));
 
     }
-else
-sell.value.remaining_amount = parseFloat(newValue);
+else{
+    sell.value.remaining_amount = parseFloat(newValue);
+    sell.value.change = 0;
 
-})
+}
+
+});
+function playClickSound() {
+    const clickSound = new Audio('/sounds/click-234708.mp3');
+    clickSound.play();
+    }
 function addNewSell(){
     loaderButton.value = true;
    const clientData =  client.value;
@@ -362,6 +371,7 @@ function filterByCategory(event) {
 
 
 function addProductToCart(id) {
+    playClickSound();
     const product = products.value.find((p) => p.id == id);
     if (product) {
         const cartProduct = { ...product, quantity: 1 };
@@ -370,6 +380,7 @@ function addProductToCart(id) {
 
 }
 function deleteProductFromCart(id) {
+    playClickSound();
     const index = carts.value.findIndex((p) => p.id === id);
     if (index !== -1) {
         carts.value.splice(index, 1); // Use .splice() to remove the item at the given index
@@ -404,5 +415,16 @@ function decrementQuantity(id) {
 onMounted(() => {
     store.dispatch("getProducts");
     store.dispatch("fetchClients");
-})
+    if (isMobile()) {
+            var div = document.getElementById('content');
+            div.style.display = 'none'; // Clear the content if on a mobile device
+            alert("لا يمكنك رؤية هذه الصفحة على الهاتف"); // Optional alert for users
+            router.push({name:'dashboard'});
+        }
+});
+function isMobile() {
+            return /Mobi|Android/i.test(navigator.userAgent);
+        }
+
+
 </script>

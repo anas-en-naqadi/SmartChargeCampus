@@ -56,7 +56,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/latest-clients',  'getLastCustomers');
         Route::get('/user',  'getLoggedUser');
         Route::post('/update-pass',  'updatePass');
-        Route::post('/changeStatus-user',  'changeUserStatus');
+        Route::post('/update-user-company',  'updateCompanyInfo');
+        Route::post('/update-user',  'updateUserProfile');
+
         Route::post('/store-user',  'storeUser');
 });
 

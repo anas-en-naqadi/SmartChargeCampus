@@ -31,6 +31,10 @@ class User extends Authenticatable
     public function expenses(){
         return $this->hasMany(Expense::class, 'user_id');
     }
+    public function company(){
+
+        return $this->hasOne(Company::class,'user_id');
+    }
     public function categories(){
         return $this->hasMany(Category::class,'user_id');
     }

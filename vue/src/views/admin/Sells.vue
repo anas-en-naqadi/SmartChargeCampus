@@ -107,12 +107,12 @@
 
                             <button title="قم بتنزيل الإيصال"
                                 class="border border-blue-500 px-2 rounded-md text-blue-500"
-                                @click="editProduct(data.id)">
+                                @click="goToInvoiceDetails(data.id)">
                                 Bon
 
                             </button>
                             <button class="border border-red-500 px-2 rounded-md text-red-500"
-                                title="قم بتنزيل الفاتورة" @click="deleteProduct(data.id)">
+                                title="قم بتنزيل الفاتورة" @click="goToInvoiceDetails(data.id)">
                                 Facture
                             </button>
                         </div>
@@ -191,11 +191,17 @@ import common from "../../utils/common";
 import { ref, onMounted, computed } from "vue";
 import store from "../../store";
 import { useToast } from "primevue/usetoast";
-const sells = ref([]);
+import { useRouter } from "vue-router";
+
+
+const sells = computed(()=>store.state.sells);
 const loading = ref(true);
 const filteredSells = ref([]);
 const date = ref({start_date:null,end_date:null});
 const toast = useToast();
+const skeletonObjects = new Array(10);
+const router = useRouter();
+
 onMounted(() => {
     fetchSells();
 });
@@ -211,12 +217,10 @@ function filterSells() {
 function fetchSells() {
     store
         .dispatch("getSells")
-        .then((res) => {
+        .then((res) =>
 
-            sells.value = res;
-            filteredSells.value = [...res];
-
-        })
+            filteredSells.value = sells.value
+        )
         .catch((error) => error)
         .finally(() => {
             loading.value = false;
@@ -238,10 +242,11 @@ function filterTable(event) {
 
         );
 }
-const total = computed(() => filteredSells.value.reduce(
-    (acc, sell) => acc + parseFloat(sell.total_amount),
+function goToInvoiceDetails(id){
+router.push({name:'show-invoice',params:{id:id}});
+}
+const total = computed(() => filteredSells.value?.reduce(
+    (acc, sell) => acc + parseFloat(sell.total_price),
     0
 ));
-// Define skeleton data
-const skeletonObjects = new Array(10);
 </script>

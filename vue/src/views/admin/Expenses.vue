@@ -2,6 +2,7 @@
     <div class="card mt-12 m-6 bg-white border border-gray-300 rounded-xl">
         <div class="flex justify-between items-center mb-4">
             <Button
+            :disabled="loading"
                 class="text-sm text-white -mt-5 font-bold py-2 px-4 ml-6 rounded-xl bg-green-600 hover:bg-green-700"
                 @click="visible = true"
             >
@@ -257,7 +258,7 @@ const skeletonObjects = new Array(10);
 
 const loading = ref(true);
 const total = computed(() =>
-    filteredExpenses.value?.reduce((acc, curr) => acc + curr.amount, 0)
+    filteredExpenses.value?.reduce((acc, curr) => acc + parseFloat(curr.amount), 0)
 );
 onMounted(() => {
     getExpenses();
@@ -268,13 +269,14 @@ function addExpense() {
         .dispatch("storeExpense", expense.value)
         .then((res) => {
             if (res && res.status === 200 && res.data) {
-                filteredExpenses.value.push(res.data.expense);
-                filteredExpenses.value.sort((a, b) => {
-        return new Date(b.created_at) - new Date(a.created_at);
-    });
+                filteredExpenses.value = [
+                    res.data.expense,
+                    ...filteredExpenses.value
+                ].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
                 store.commit("SET_EXPENSES",filteredExpenses.value);
                 expense.value = {};
                 visible.value = false;
+                console.log("New total:", total.value); // Debugging total value
 
                 common.showToast({ title: res.data.message, icon: "success" });
             } else common.showValidationErrors(res, toast);
