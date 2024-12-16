@@ -4,11 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 
-use App\Models\Product;
-use App\Models\Sell;
 use App\Services\DashboardService;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
+
 
 class DashboardController extends Controller
 {
@@ -50,54 +47,60 @@ class DashboardController extends Controller
 
 
 
-    public function getStockByCategory()
+    public function getWeeklyChargeData()
     {
-        $cacheData = $this->dashboardService->stockByCategory();
+        $cacheData = $this->dashboardService->getWeeklyChargeData(Self::colors, Self::borderColors);
         return response()->json($cacheData);
     }
 
-
-    public function dashboardData()
+    public function getPortsPerStation()
     {
-        $cacheData = $this->dashboardService->dashboardData();
-
-
+        $cacheData = $this->dashboardService->getPortsPerStation();
         return response()->json($cacheData);
     }
-
-
-
-
-
-    public function weeklySalesChart()
+    public function userDashboardData()
     {
-        $cacheData = $this->dashboardService->weeklySales(Self::colors, Self::borderColors);
-
-        return response()->json($cacheData);
-    }
-
-
-
-
-
-
-    public function monthlySalesChart()
-    {
-        $cacheData = $this->dashboardService->monthlySales(Self::colors, Self::borderColors);
+        $cacheData = $this->dashboardService->userDashboardData();
 
 
         return response()->json($cacheData);
     }
-
-    public function monthlyRemaining()
+    public function getPaymentStatus()
     {
+        $cacheData = $this->dashboardService->getPaymentStatusPercentages();
 
-        $cacheData = $this->dashboardService->monthlyRemaining(Self::colors, Self::borderColors);
+
         return response()->json($cacheData);
     }
-    public function latestSells()
+    public function adminDashboardData()
     {
-        $sells = Sell::latest()->limit(8)->get();
-        return response()->json($sells);
+        $cacheData = $this->dashboardService->adminDashboardData();
+
+
+        return response()->json($cacheData);
+    }
+    public function PaidAmountEachMonth()
+    {
+        $cacheData = $this->dashboardService->PaidAmountEachMonth();
+
+
+        return response()->json($cacheData);
+    }
+    public function PaidAmountEachWeek()
+    {
+        $cacheData = $this->dashboardService->PaidAmountEachWeek();
+
+
+        return response()->json($cacheData);
+    }
+
+
+
+
+    public function getMonthlyChargeData()
+    {
+        $cacheData = $this->dashboardService->getMonthlyChargeData(Self::colors, Self::borderColors);
+
+        return response()->json($cacheData);
     }
 }

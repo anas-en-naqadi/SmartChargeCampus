@@ -26,15 +26,7 @@ class DatabaseSeeder extends Seeder
 // limits
 
          \App\Models\User::factory(1)->create();
-        \App\Models\Client::factory(50)->create();
-
-        \App\Models\Category::factory(3)->create();
-        \App\Models\Product::factory(20)->create();
-        \App\Models\Sell::factory(10)->create();
-
-        \App\Models\Purchase::factory(10)->create();
-        \App\Models\Expense::factory(15)->create();
-          \App\Models\SellProduct::factory(50)->create();
+      
 
 
 

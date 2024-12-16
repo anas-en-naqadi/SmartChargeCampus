@@ -1,13 +1,22 @@
 import { createRouter, createWebHistory } from "vue-router";
-import AdminRouter from "./AdminRouter";
+import AdminRouter from "./routes/AdminRouter";
+import UserRoutes from "./routes/UserRoutes";
 import store from "../store";
 const routes = [
-    ...AdminRouter,
+    {
+        path: "/pannel",
+        redirect: "/pannel",
+        component: () => import("@/components/Layout.vue"),
+        meta: {
+            requiresAuth: true,
+        },
+        children: [...AdminRouter, ...UserRoutes],
+    },
     {
         path: "/login",
         name: "login",
         meta: {
-            title: "Login - MAHALI",
+            title: "Login",
         },
         component: () => import("@/views/auth/Login.vue"),
     },
@@ -15,7 +24,7 @@ const routes = [
         path: "/register",
         name: "register",
         meta: {
-            title: "Register - MAHALI",
+            title: "Register",
         },
         component: () => import("@/views/auth/Register.vue"),
     },
@@ -29,7 +38,7 @@ const routes = [
     },
     {
         path: "/emailVerification",
-        name:"emailVerification",
+        name: "emailVerification",
         component: () => import("@/views/auth/EmailVerification.vue"),
         meta: {
             requiresAuth: false,
@@ -46,6 +55,15 @@ const routes = [
         },
     },
     {
+        path: "/forbidden",
+        component: () => import("@/components/Forbidden.vue"),
+        name: "forbidden",
+        meta: {
+            requiresAuth: false,
+            title: "403 Forbidden",
+        },
+    },
+    {
         path: "/serverError",
         component: () => import("@/components/ServerError.vue"),
         name: "serverError",
@@ -55,19 +73,29 @@ const routes = [
         },
     },
 ];
+
 const router = createRouter({
     history: createWebHistory(),
     routes,
 });
+
+const roleDashboardMap = {
+    student: "user-dashboard",
+    admin: "admin-dashboard",
+};
+
+
 router.beforeEach((to, from, next) => {
     document.title = `${to.meta.title}`;
-    if (to.meta.requiresAuth && !sessionStorage.getItem("TOKEN")) {
-        next({ name: "login" });
-    } else if (!sessionStorage.getItem("TOKEN") && to.meta.isGuest) {
-        next({ name: "login" });
-    } else if (sessionStorage.getItem("TOKEN") && to.name === "login") {
-        next({ name: "dashboard" });
+    const token = sessionStorage.getItem("TOKEN");
+    const userRole = store.state.user.data?.role;
 
+        if (to.meta.requiresAuth && !token) {
+        next({ name: "login" });
+    } else if (!token && to.meta.isGuest) {
+        next({ name: "login" });
+    }else if (token && to.name === "login") {
+        next({ name: roleDashboardMap[userRole] || "forbidden" }); // Prevent logged-in user from accessing login
     } else {
         next();
     }

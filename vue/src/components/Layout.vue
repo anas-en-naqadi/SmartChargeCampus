@@ -234,8 +234,10 @@
                             </svg>
                         </button>
 
-                        <a href="#" class="text-xl font-bold flex items-center lg:ml-2.5">
-                            <img id="logo" src="@/assets/images/mahali.PNG" class="h-16 w-24 mr-2" alt="mahali Logo" />
+                        <a href="#" class=" font-bold flex items-center lg:ml-2.5">
+                            <!-- <img id="logo" loading="lazy" src="@/assets/images/SMART_CHARGE_CAMPUS.webp"
+                                class="h-12 w-24 mr-2" alt="mahali Logo" /> -->
+                            <span class="2xl:text-2xl md:tex-xl sm:text-lg text-sm">SMART <span class="text-green-500">CHARGE</span> CAMPUS</span>
                         </a>
                     </div>
 
@@ -245,7 +247,7 @@
                                 <div class="">
                                     <button @click="
                                         notifiable = !notifiable;
-                                    setRead_at();
+                                    ;
                                     " type="button"
                                         class="relative inline-flex items-center md:mr-3 md:w-12 p-3 mr-5 mt-2 text-sm font-medium text-center text-black rounded-lg hover:bg-blue-200 focus:ring-1 focus:outline-none focus:ring-blue-100">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -255,7 +257,7 @@
                                                 d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
                                         </svg>
 
-                                        <span class="sr-only">الإشعارات</span>
+                                        <span class="sr-only">Notifications</span>
                                         <div id="counter"
                                             class="absolute inline-flex items-center justify-center md:w-4 md:h-4 w-6 h-6 text-xs font-bold text-white bg-red-500 border-1 text-center border-black rounded-full top-2 end-1.5 ">
                                             {{ counter }}
@@ -267,7 +269,7 @@
                                     role="alert">
                                     <div class="flex items-center mb-3 z-50">
                                         <span class="mb-1 text-md font-semibold text-gray-900 white:text-white">
-                                            الإشعارات</span>
+                                            Notifications</span>
                                         <button type="button" id="notif-box" @click="notifiable = !notifiable"
                                             class="ms-auto -mx-1.5 -my-1.5 bg-white justify-center items-center flex-shrink-0 text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex h-8 w-8 white:text-gray-500 white:hover:text-white white:bg-gray-800 white:hover:bg-gray-700"
                                             data-dismiss-target="#toast-notification" aria-label="Close">
@@ -301,16 +303,15 @@
                                     </div>
 
                                     <div v-else class="text-gray-600 text-center text-sm font-semibold">
-                                        لا توجد إشعارات
-                                    </div>
+                                        Pas de notifications </div>
                                     <div v-if="notifications.length" @click="deleteAllNotifiable()"
                                         class="text-red-600 border-t-2  text-center font-bold text-sm cursor-pointer hover:underline py-1.5 w-full">
-                                        مسح الكل
+                                        Supprimer tout
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <a>
+                        <router-link to="/profile">
                             <div class="flex cursor-pointer">
                                 <div v-if="Object.keys(user).length"
                                     class="hidden xl:flex lg:flex md:flex flex-col gap-2 md:mr-1 mr-2 p-2 justify-center">
@@ -333,141 +334,114 @@
 
                                 <avatar :fullname="user.name" :size="50"></avatar>
                             </div>
-                        </a>
+                        </router-link>
                     </div>
                 </div>
             </div>
         </nav>
         <div class="flex overflow-hidden bg-white pt-16">
             <aside id="sidebar"
-                class="fixed z-20 hidden -mt-1  h-full top-0 left-0 pt-14 flex lg:flex flex-shrink-0 flex-col w-56  transition-width duration-75"
+                class="fixed z-20 hidden -mt-3  h-full top-0 left-0 pt-14 flex lg:flex flex-shrink-0 flex-col w-57  transition-width duration-75"
                 aria-label="Sidebar">
                 <div class="relative flex-1 flex shadow-md h-full flex-col min-h-0 border-r border-gray-200 pt-0">
                     <div class="flex-1  flex flex-col pt-5 pb-4 overflow-y-auto">
-                        <div class="flex-1 px-3  bg-white divide-y space-y-1">
-                            <ul class="space-y-2 pb-2">
-                                <li>
-                                    <router-link :to="{ name: 'dashboard' }" :class="{
-                                        'text-white bg-stone-500': route.name === 'dashboard',
+                        <div class="flex-1 px-3  bg-white divide-y space-y-2 pt-2">
+                            <ul v-if="user.role === 'student'" class="space-y-2 pb-2 ">
+                                <li >
+                                    <router-link :to="{ name: 'user-dashboard' }" :class="{
+                                        'text-white bg-sky-500': route.name === 'user-dashboard',
                                         'text-base text-gray-900 font-normal rounded-lg mt-2 hover:bg-gray-100 hover:text-gray-900 group transition duration-75 flex items-center p-2': true
                                     }">
                                         <i class="fas fa-tachometer-alt"></i>
-
-                                        <span class="ml-3">إحصائيات</span>
+                                        <span class="ml-3">Tableau de bord</span>
                                     </router-link>
                                 </li>
                                 <li>
-                                    <router-link :to="{ name: 'categories' }" :class="{
-                                        'text-white bg-cyan-500': route.name === 'categories',
-                                        'text-base text-gray-900 font-normal rounded-lg hover:bg-gray-100 hover:text-gray-900 group transition duration-75 flex items-center p-2': true
+                                    <router-link :to="{ name: 'charge-stations' }" :class="{
+    'text-white bg-emerald-500': route.name === 'charge-stations',
+                                        'text-base text-gray-900 font-normal rounded-lg mt-2 hover:bg-gray-100 hover:text-gray-900 group transition duration-75 flex items-center p-2': true
                                     }">
-                                        <i class="fas fa-th-large"></i>
-
-
-                                        <span class="ml-3"> جميع الفئات</span>
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        <span class="ml-3">stations de recharge</span>
                                     </router-link>
                                 </li>
                                 <li>
-                                    <router-link :to="{ name: 'purchases' }" :class="{
-                                        'text-white bg-fuchsia-600': route.name === 'purchases',
-                                        'text-base text-gray-900 font-normal rounded-lg hover:bg-gray-100 hover:text-gray-900 group transition duration-75 flex items-center p-2': true
+                                    <router-link :to="{ name: 'reservations' }" :class="{
+                                        'text-white bg-stone-500': route.name === 'reservations',
+                                        'text-base text-gray-900 font-normal rounded-lg mt-2 hover:bg-gray-100 hover:text-gray-900 group transition duration-75 flex items-center p-2': true
                                     }">
-                                        <i class="fas fa-cart-plus"></i>
-                                        <span class="ml-3 flex-1 whitespace-nowrap">إضافة المشتريات</span>
-                                    </router-link>
-                                </li>
-
-                                <li>
-                                    <router-link :to="{ name: 'products' }" :class="{
-                                        'text-white bg-orange-600': route.name === 'blacklist',
-                                        'text-base text-gray-900 font-normal rounded-lg hover:bg-gray-100 hover:text-gray-900 group transition duration-75 flex items-center p-2': true
-                                    }">
-                                        <i class="fas fa-box-open"></i>
-
-                                        <span class="ml-3 flex-1 whitespace-nowrap">إضافة المنتجات</span>
+                                        <i class="fas fa-calendar-alt"></i>
+                                        <span class="ml-3">Réservations</span>
                                     </router-link>
                                 </li>
 
 
+
+
+
+
+
+
+                            </ul>
+                            <ul v-else class="space-y-2 pb-2">
                                 <li>
-                                    <router-link :to="{ name: 'sells' }" :class="{
-                                        'text-white bg-emerald-600': route.name === 'sells',
-                                        'text-base text-gray-900 font-normal rounded-lg hover:bg-gray-100 hover:text-gray-900 group transition duration-75 flex items-center p-2': true
+                                    <router-link :to="{ name: 'admin-dashboard' }" :class="{
+                                        'text-white bg-blue-500': route.name === 'admin-dashboard',
+                                        'text-base text-gray-900 font-normal rounded-lg mt-2 hover:bg-gray-100 hover:text-gray-900 group transition duration-75 flex items-center p-2': true
                                     }">
-                                        <i class="fas fa-chart-bar"></i>
-                                        <span class="ml-3">تقارير البيع</span>
+                                        <i class="fas fa-tachometer-alt"></i> <!-- Icône Tableau de Bord -->
+                                        <span class="ml-3">Tableau de Bord</span>
                                     </router-link>
                                 </li>
                                 <li>
-                                    <router-link :to="{ name: 'new-sale' }" :class="{
-                                        'text-white bg-sky-500': route.name === 'new-sale',
-                                        'text-base text-gray-900 font-normal rounded-lg hover:bg-gray-100 hover:text-gray-900 group transition duration-75 flex items-center p-2': true
+                                    <router-link :to="{ name: 'students' }" :class="{
+                                        'text-white bg-red-500': route.name === 'students',
+                                        'text-base text-gray-900 font-normal rounded-lg mt-2 hover:bg-gray-100 hover:text-gray-900 group transition duration-75 flex items-center p-2': true
                                     }">
-                                        <i class="fas fa-plus-square"></i>
-                                        <span class="ml-3 flex-1 whitespace-nowrap">عملية بيع جديدة</span>
+                                        <i class="fas fa-user-graduate"></i> <!-- Icône Étudiants -->
+                                        <span class="ml-3">Étudiants</span>
                                     </router-link>
                                 </li>
+                                <li>
+                                    <router-link :to="{ name: 'admin-reservations' }" :class="{
+                                        'text-white bg-stone-500': route.name === 'admin-reservations',
+                                        'text-base text-gray-900 font-normal rounded-lg mt-2 hover:bg-gray-100 hover:text-gray-900 group transition duration-75 flex items-center p-2': true
+                                    }">
+                                        <i class="fas fa-calendar-check"></i> <!-- Icône Réservations -->
+                                        <span class="ml-3">Réservations</span>
+                                    </router-link>
+                                </li>
+                                <li>
+                                    <router-link :to="{ name: 'charge-stations-admin' }" :class="{
+                                        'text-white bg-green-500': route.name === 'charge-stations-admin',
+                                        'text-base text-gray-900 font-normal rounded-lg mt-2 hover:bg-gray-100 hover:text-gray-900 group transition duration-75 flex items-center p-2': true
+                                    }">
+                                        <i class="fas fa-charging-station"></i> <!-- Icône Station de Charge -->
+                                        <span class="ml-3">Stations de Charge</span>
+                                    </router-link>
+                                </li>
+
                             </ul>
                             <div class="space-y-2 pt-2">
                                 <ul class="space-y-2 ">
+
                                     <li>
-                                        <router-link :to="{ name: 'admin-all-products' }" :class="{
-                                            'text-white bg-violet-600': route.name === 'admin-all-products',
-                                            'text-base text-gray-900 font-normal rounded-lg hover:bg-gray-100 hover:text-gray-900 group transition duration-75 flex items-center p-2': true
-                                        }"><i class="fas fa-clipboard-list"></i>
-                                            <span class="ml-3 flex-1 whitespace-nowrap">تقرير المخزون</span>
+                                        <router-link
+                                            :to="{ name: user.role === 'student' ? 'profile' : 'admin-profile' }" :class="{
+                                                'text-white bg-amber-500': route.name === 'profile',
+                                                'text-base text-gray-900 font-normal rounded-lg hover:bg-gray-100 hover:text-gray-900 group transition duration-75 flex items-center p-2': true
+                                            }">
+                                            <i class="fas fa-user"></i>
+                                            <span class="ml-3"> Profile </span>
                                         </router-link>
                                     </li>
-
-
-                                    <li>
-                                        <router-link :to="{ name: 'clients' }" :class="{
-                                            'text-white bg-yellow-600': route.name === 'clients',
-                                            'text-base text-gray-900 font-normal rounded-lg hover:bg-gray-100 hover:text-gray-900 group transition duration-75 flex items-center p-2': true
-                                        }">
-                                            <i class="fas fa-users"></i>
-
-                                            <span class="ml-3">تقارير الزبناء</span>
-                                        </router-link>
-                                    </li>
-                                    <li>
-                                        <router-link :to="{ name: 'suppliers' }" :class="{
-                                            'text-white bg-pink-500': route.name === 'suppliers',
-                                            'text-base text-gray-900 font-normal rounded-lg hover:bg-gray-100 hover:text-gray-900 group transition duration-75 flex items-center p-2': true
-                                        }">
-                                            <i class="fas fa-file-contract"></i>
-                                            <span class="ml-3 flex-1 whitespace-nowrap">تقارير الموردين </span>
-                                        </router-link>
-                                    </li>
-
-                                    <li>
-                                        <router-link :to="{ name: 'expenses' }" :class="{
-                                            'text-white bg-rose-500': route.name === 'expenses',
-                                            'text-base text-gray-900 font-normal rounded-lg hover:bg-gray-100 hover:text-gray-900 group transition duration-75 flex items-center p-2': true
-                                        }">
-                                            <i class="fas fa-money-bill-wave"></i>
-
-                                            <span class="ml-3">المصاريف</span>
-                                        </router-link>
-                                    </li>
-                                    <li>
+                                    <li v-if="user.role==='admin'">
                                         <router-link :to="{ name: 'activities' }" :class="{
-                                            'text-white bg-lime-500': route.name === 'activities',
+                                            'text-white bg-purple-500': route.name === 'activities',
                                             'text-base text-gray-900 font-normal rounded-lg hover:bg-gray-100 hover:text-gray-900 group transition duration-75 flex items-center p-2': true
                                         }">
-                                            <i class="fas fa-file-alt"></i>
-
-                                            <span class="ml-3">تتبع سجل العمليات</span>
-                                        </router-link>
-                                    </li>
-                                    <li>
-                                        <router-link :to="{ name: 'settings' }" :class="{
-                                            'text-white bg-amber-500': route.name === 'settings',
-                                            'text-base text-gray-900 font-normal rounded-lg hover:bg-gray-100 hover:text-gray-900 group transition duration-75 flex items-center p-2': true
-                                        }">
-<i class="fas fa-gear"></i>
-
-                                            <span class="ml-3"> الإعدادات </span>
+                                            <i class="fas fa-calendar-alt"></i> <span class="ml-3"> Journaux
+                                                d'activités </span>
                                         </router-link>
                                     </li>
                                 </ul>
@@ -477,7 +451,7 @@
                                     class="text-base w-full text-gray-900 cursor-pointer font-normal  rounded-lg hover:bg-gray-100 group transition duration-75 flex items-center p-2">
                                     <i class="fas fa-sign-out-alt"></i>
 
-                                    <span class="ml-3">تسجيل الخروج</span>
+                                    <span class="ml-3">Déconnecter</span>
                                 </button>
                             </div>
                         </div>
@@ -491,50 +465,58 @@
                 <main>
                     <router-view></router-view>
                 </main>
-                <footer
-                    class="bg-white md:flex md:items-center md:justify-between shadow rounded-lg p-4 md:p-6 xl:p-8 my-6 mx-4">
+                <footer class="bg-white shadow rounded-lg p-4 md:p-6 xl:p-8 my-6 mx-4">
+                    <div class="flex flex-wrap gap-3 md:justify-center 2xl:justify-between xl:justify-between  justify-center items-center">
+                        <!-- Social Icons -->
+                        <div class="flex justify-center space-x-6 mb-4 md:mb-0">
+                            <a href="#" target="_blank" class="text-gray-500 hover:text-gray-900">
+                                <svg class="h-5 w-5 text-blue-600" fill="currentColor" viewBox="0 0 24 24"
+                                    aria-hidden="true">
+                                    <path fill-rule="evenodd"
+                                        d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                            </a>
+                            <a href="#" target="_blank" class="text-gray-500 hover:text-gray-900">
+                                <svg class="h-5 w-5 text-purple-600" fill="currentColor" viewBox="0 0 24 24"
+                                    aria-hidden="true">
+                                    <path fill-rule="evenodd"
+                                        d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.45 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                            </a>
+                        </div>
 
-                    <div class="flex sm:justify-center space-x-6">
-                        <a :href="user.company?.facebook_url ?? '#'" target="_blank" class="text-gray-500 hover:text-gray-900">
-                            <svg class="h-5 w-5 text-blue-600" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                <path fill-rule="evenodd"
-                                    d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"
-                                    clip-rule="evenodd" />
-                            </svg>
-                        </a>
-                        <a :href="user.company?.instagram_url ?? '#'" target="_blank" class="text-gray-500 hover:text-gray-900">
-                            <svg class="h-5 w-5 text-purple-600" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                <path fill-rule="evenodd"
-                                    d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.45 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z"
-                                    clip-rule="evenodd" />
-                            </svg>
-                        </a>
-
-
+                        <!-- Footer Links -->
+                        <ul class="flex flex-wrap justify-center md:justify-start space-x-6 mb-6 md:mb-0">
+                            <li>
+                                <a href="#" class="text-sm font-normal text-gray-500 hover:underline">Conditions
+                                    d'utilisation</a>
+                            </li>
+                            <li>
+                                <a href="#" class="text-sm font-normal text-gray-500 hover:underline">Politique de
+                                    confidentialité</a>
+                            </li>
+                            <li>
+                                <a href="#" class="text-sm font-normal text-gray-500 hover:underline">Licence</a>
+                            </li>
+                            <li>
+                                <a href="#" class="text-sm font-normal text-gray-500 hover:underline">Politique sur les
+                                    cookies</a>
+                            </li>
+                            <li>
+                                <a href="#" class="text-sm font-normal text-gray-500 hover:underline">Contactez-nous</a>
+                            </li>
+                        </ul>
                     </div>
-                    <ul class="flex items-center flex-wrap mb-6 md:mb-0">
-        <li>
-            <a href="#" class="text-sm font-normal text-gray-500 hover:underline mr-4 md:mr-6">الشروط والأحكام</a>
-        </li>
-        <li>
-            <a href="#" class="text-sm font-normal text-gray-500 hover:underline mr-4 md:mr-6">سياسة الخصوصية</a>
-        </li>
-        <li>
-            <a href="#" class="text-sm font-normal text-gray-500 hover:underline mr-4 md:mr-6">الترخيص</a>
-        </li>
-        <li>
-            <a href="#" class="text-sm font-normal text-gray-500 hover:underline mr-4 md:mr-6">سياسة الكوكيز</a>
-        </li>
-        <li>
-            <a href="#" class="text-sm font-normal text-gray-500 hover:underline">اتصل بنا</a>
-        </li>
-    </ul>
                 </footer>
-                <p class="text-center text-sm text-gray-500 my-10"
-                >
 
-   جميع الحقوق محفوظة   <a href="#" class="hover:underline" target="_blank">, محالي</a> &copy; 2024-2025
-</p>
+                <p class="text-center text-sm text-gray-500 my-10">
+                    Tous droits réservés <a href="#" class="hover:underline" target="_blank">, Smart Charge Campus</a>
+                    &copy;
+                    2024-2025
+                </p>
+
 
             </div>
         </div>
@@ -556,16 +538,16 @@ const counter = ref(0);
 const notifiable = ref(false);
 
 onMounted(() => {
-    fetchNotifications();
+    // fetchNotifications();
     store.dispatch("getLoggedUser");
-    const notificationInterval = setInterval(() => {
-        fetchNotifications();
+    // const notificationInterval = setInterval(() => {
+    //     fetchNotifications();
 
-    }, 60000);
+    // }, 60000);
 
     // Clear the interval when the app is closed or unmounted
     onBeforeUnmount(() => {
-        clearInterval(notificationInterval);
+        //  clearInterval(notificationInterval);
     });
 });
 
@@ -583,7 +565,7 @@ function toggle() {
 function fetchNotifications() {
     store.dispatch("getNotifications").then((res) => {
         notifications.value = res;
-        counter.value = notifications.value.filter((n)=>n.read_at === null).length;
+        counter.value = notifications.value.filter((n) => n.read_at === null).length;
     });
 }
 function logout() {

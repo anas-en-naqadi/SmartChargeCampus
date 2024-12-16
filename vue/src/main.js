@@ -19,10 +19,14 @@ import Column from "primevue/column";
 import DataTable from "primevue/datatable";
 import Dialog from "primevue/dialog";
 import { setupAxiosInterceptors } from "../axios"; // Adjust path
+import vue3GoogleLogin from "vue3-google-login";
 
-// Set up Axios interceptors
 setupAxiosInterceptors(router);
 createApp(App)
+    .use(vue3GoogleLogin, {
+        clientId:
+            "24443962997-s3fa4hu3e0jvoivduf2rl2bcsaue0vf5.apps.googleusercontent.com",
+    })
     .use(VueSweetalert2)
     .use(PrimeVue)
     .use(ToastService)

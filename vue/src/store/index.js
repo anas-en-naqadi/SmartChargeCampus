@@ -1,16 +1,12 @@
 import { createStore } from "vuex";
 import adminActions from "./actions/AdminActions";
-import Expenses from "../views/admin/Expenses.vue";
-
+import userActions from "./actions/UserActions";
 const store = createStore({
     state: {
-        products: [],
-        suppliers: [],
-        purchases:[],
-        expenses:[],
-        categories:[],
-        clients:[],
-        sells:[],
+        reservations: [],
+        students: [],
+        charge_stations: [],
+
         user: {
             data: {},
             token: sessionStorage.getItem("TOKEN"),
@@ -19,36 +15,22 @@ const store = createStore({
     getters: {},
     actions: {
         ...adminActions,
+        ...userActions,
     },
     mutations: {
-        SET_PRODUCTS(state, products) {
-            // Update the products state with the received data
-            state.products = products;
+        SET_RESERVATIONS(state, reservations) {
+            // Update the reservations state with the received data
+            state.reservations = reservations;
         },
-        SET_SELLS(state, sells) {
-            // Update the sells state with the received data
-            state.sells = sells;
+        SET_STUDENTS(state, students) {
+            // Update the students state with the received data
+            state.students = students;
         },
-        SET_CLIENTS(state, clients) {
-            // Update the clients state with the received data
-            state.clients = clients;
+        SET_CHARGE_STATIONS(state, charge_stations) {
+            // Update the charge_stations state with the received data
+            state.charge_stations = charge_stations;
         },
-        SET_CATEGORIES(state, categories) {
-            // Update the categories state with the received data
-            state.categories = categories;
-        },
-        SET_EXPENSES(state, expenses) {
-            // Update the expenses state with the received data
-            state.expenses = expenses;
-        },
-        SET_PURCHASES(state, purchases) {
-            // Update the purchases state with the received data
-            state.purchases = purchases;
-        },
-        SET_SUPPLIERS(state, suppliers) {
-            // Update the products state with the received data
-            state.suppliers = suppliers;
-        },
+
         SET_USER(state, user) {
             state.user.data = user;
         },

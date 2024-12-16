@@ -24,11 +24,17 @@ class UserFactory extends Factory
     public function definition(): array
     {
         $this->faker = \Faker\Factory::create('ar_SA');
-        return [
-            'name' => fake()->name(),
-            'email' => $this->faker->unique()->safeEmail,
-            'phone' => fake()->unique()->phoneNumber(),
-            'password' => Hash::make('admin@admin.com')
+        // return [
+        //     'name' => 'Admin',
+        //     'email' => 'campus@admin.com',
+        //     'password' => Hash::make('campus@admin.com'),
+        //     'role' => 'admin'
+        // ];
+         return [
+            'name' => 'Anas Enq',
+            'email' => 'anas@student.com',
+            'password' => Hash::make('anas@student.com'),
+            'role' => 'student'
         ];
     }
 

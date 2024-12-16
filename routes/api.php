@@ -2,17 +2,15 @@
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\NotificationController;
-use App\Http\Controllers\SellController;
 
-use App\Http\Controllers\ProductController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\ClientController;
-use App\Http\Controllers\ExpenseController;
-use App\Http\Controllers\PurchaseController;
-use App\Http\Controllers\SupplierController;
-use App\Models\Sell;
+use App\Http\Controllers\ChargingStationController;
+use App\Http\Controllers\PortController;
+use App\Http\Controllers\ReservationController;
+use App\Http\Controllers\SocialiteController;
+use App\Http\Controllers\StudentController;
+
 
 use Illuminate\Support\Facades\Route;
 use Spatie\Activitylog\Models\Activity;
@@ -30,50 +28,59 @@ use Spatie\Activitylog\Models\Activity;
 
 Route::middleware(['auth:sanctum'])->group(function () {
 
-    // route resources
-    Route::resource('product', ProductController::class);
-    Route::resource('category', CategoryController::class);
-    Route::resource('purchase', PurchaseController::class);
-    Route::resource('expense', ExpenseController::class);
-    Route::resource('/supplier',SupplierController::class);
-    Route::resource('/client', ClientController::class);
-    Route::resource('/sell',SellController::class);
+    // Port Routes
+    Route::resource('port', PortController::class)->middleware('admin');
+    Route::post('/mark-as-not-reserved', [PortController::class, 'markPortAsNotReserved'])->middleware('admin');
 
+    // Charging Station Routes
+    Route::resource('charge-station', ChargingStationController::class)
+        ->except(['store', 'update', 'destroy']);
+    Route::post('/charge-station', [ChargingStationController::class, 'store'])->middleware('admin');
+    Route::put('/charge-station/{id}', [ChargingStationController::class, 'update'])->middleware('admin');
+    Route::delete('/charge-station/{ChargingStation}', [ChargingStationController::class, 'destroy'])->middleware('admin');
 
-   // Dashboard Routes
+    // Reservation Routes
+    Route::resource('reserve', ReservationController::class)
+        ->except(['destroy']);
+    Route::post('/filterReservationsByDates', [ReservationController::class, 'filterReservationsByDates'])
+    ->middleware('admin');
+    Route::post('/cancel-reservation', [ReservationController::class, 'cancelReservation']);
+    Route::post('/mark-reservation-as-paid', [ReservationController::class, 'markReservationAsPayed'])->middleware('admin');
+
+    // Student Routes
+    Route::get('/student', [StudentController::class, 'index'])->middleware('admin');
+
+    // Dashboard Routes
     Route::controller(DashboardController::class)->group(function () {
-        Route::get('/weekly-sales', 'weeklySalesChart');
-        Route::get('/monthly-sales', 'monthlySalesChart');
-        Route::get('/month-remaining', 'monthlyRemaining');
-        Route::get('/stock-by-category', 'getStockByCategory');
-        Route::get('/latest-sells', 'latestSells');
-        Route::get('/dashboard-data', [DashboardController::class, 'dashboardData']);
+        Route::get('/charge-per-week', 'getWeeklyChargeData');
+        Route::get('/charge-per-month', 'getMonthlyChargeData');
+        Route::get('/user-dashboard-data', 'userDashboardData');
+        // Admin Dashboard
+        Route::middleware('admin')->group(function () {
+            Route::get('/admin-dashboard-data', 'adminDashboardData');
+            Route::get('/gain-amount-per-week', 'PaidAmountEachWeek');
+            Route::get('/gain-amount-per-month', 'PaidAmountEachMonth');
+            Route::get('/payment-status', 'getPaymentStatus');
+            Route::get('/charge-station-port-count', 'getPortsPerStation');
+        });
     });
 
     // User Routes
-
     Route::controller(UserController::class)->group(function () {
-        Route::get('/latest-clients',  'getLastCustomers');
-        Route::get('/user',  'getLoggedUser');
-        Route::post('/update-pass',  'updatePass');
-        Route::post('/update-user-company',  'updateCompanyInfo');
-        Route::post('/update-user',  'updateUserProfile');
-
-        Route::post('/store-user',  'storeUser');
-});
+        Route::get('/user', 'getLoggedUser');
+        Route::post('/update-pass', 'updatePass');
+        Route::post('/update-student-profile', 'updateUserProfile');
+        Route::post('/update-user', 'updateUserProfile');
+    });
 
     // Notification Routes
-
-    Route::controller(NotificationController::class)->group(function(){
+    Route::controller(NotificationController::class)->group(function () {
         Route::get('/notifications', 'adminNotifications');
         Route::get('/delete-notifications', 'deleteAllNotifiable');
         Route::post('/setReadAt', 'setRead_at');
     });
 
     // Random Routes
-
-    Route::post('/existing-purchase', [PurchaseController::class, 'storeExistingProduct']);
-    Route::post('/new-debt', [SupplierController::class, 'addNewDebt']);
     Route::get('/activity', function () {
         $cacheKey = 'activities';
 
@@ -84,9 +91,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
         });
 
         return response()->json($cachedData);
-    });
+    })->middleware('admin');
+
     Route::post('/logout', [AuthController::class, 'logout']);
-    Route::post('/filterSellsByDates', [SellController::class, 'filterSellsByDates']);
 });
 
 
@@ -98,15 +105,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 Route::middleware('guest')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
-    Route::get('/pdf-invoice', [SellController::class, 'downloadInvoiceAsPdf']);
 
-    Route::get("/invoice12", function () {
-        $invoice = Sell::with('products','client')->first();
-        return view("invoice",['invoice' => $invoice]);
-    });
-
-
-
-
-
+    Route::get('/auth/google', [SocialiteController::class, 'redirectToGoogle']);
+    Route::get('/auth/google/callback', [SocialiteController::class, 'handleGoogleCallback']);
 });

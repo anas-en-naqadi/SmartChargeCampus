@@ -1,9 +1,9 @@
 <template>
-    <div class="w-full flex flex-col h-screen m-auto items-center justify-center overflow-auto">
+    <div class="w-full flex flex-col h-screen m-auto items-center justify-center overflow-y-scroll">
         <!-- component -->
         <div class="w-full h-screen -mt-12  flex flex-col items-center justify-center">
-            <svg class="w-full xl:1/2 md:w-1/3 lg:w-1/4 text-blue-600" xmlns="http://www.w3.org/2000/svg" data-name="Layer 1"
-                viewBox="0 0 1119.60911 699" xmlns:xlink="http://www.w3.org/1999/xlink">
+            <svg class="w-full xl:1/2 md:w-1/3 lg:w-1/4 text-blue-600" xmlns="http://www.w3.org/2000/svg"
+                data-name="Layer 1" viewBox="0 0 1119.60911 699" xmlns:xlink="http://www.w3.org/1999/xlink">
                 <circle cx="292.60911" cy="213" r="213" fill="#f2f2f2"></circle>
                 <path d="M31.39089,151.64237c0,77.49789,48.6181,140.20819,108.70073,140.20819"
                     transform="translate(-31.39089 -100.5)" fill="#2f2e41"></path>
@@ -93,23 +93,27 @@
                 <p class="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-600 mt-2">Server Error</p>
                 <p class="md:text-lg xl:text-xl text-gray-500 mt-4">Whoops, something went wrong on our servers.</p>
             </div>
-            <router-link :to="{ name: token ? 'dashboard' : 'login'}"
-            class="flex items-center space-x-2 gap-2  bg-red-600 mt-8  hover:bg-red-700 text-gray-100 px-4 py-2 rounded transition duration-150"
-            >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd"
-                    d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z"
-                    clip-rule="evenodd"></path>
-            </svg>
-            الرجوع إلى الصفحة الرئيسية</router-link>
+            <router-link :to="{
+                name: user.token
+                    ? (user.data.role === 'student' ? 'user-dashboard' : 'admin-dashboard')
+                    : 'login'
+            }"
+                class="flex items-center space-x-2 gap-2  bg-red-600 mt-8  hover:bg-red-700 text-gray-100 px-4 py-2 rounded transition duration-150">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd"
+                        d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z"
+                        clip-rule="evenodd"></path>
+                </svg>
+                Retourner à la page principale
+            </router-link>
         </div>
 
     </div>
 </template>
 
-
 <script setup>
 import { computed } from 'vue';
 import store from '../store';
-const token = computed(() => store.state.user.token);
+const user = computed(() => store.state.user);
 </script>
+

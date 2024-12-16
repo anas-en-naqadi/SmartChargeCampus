@@ -22,4 +22,6 @@ class AdminMiddleware
 
           return abort(403, 'Unauthorized.');
     }
+
+    
 }

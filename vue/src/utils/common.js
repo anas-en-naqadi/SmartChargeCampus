@@ -20,7 +20,7 @@ export default {
         confirmButtonColor,
         cancelButtonColor,
         showCancelButton,
-        cancelButtonText = "إلغاء",
+        cancelButtonText = "Retour",
     }) {
         const options = {
             title,
@@ -45,6 +45,14 @@ export default {
         return parseFloat(number)
             .toFixed(2) // Keep two decimal places
             .replace(/\B(?=(\d{3})+(?!\d))/g, ","); // Add commas
+    },
+    formatIntNumber(number) {
+        if (number === null || number === undefined || isNaN(number)) {
+            return "0.00"; // Default value if the number is invalid
+        }
+
+        // Ensure number is a float and format with commas
+        return parseInt(number).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); // Add commas
     },
     formatDate(date) {
         let formattedDate = new Date(date)
@@ -105,7 +113,6 @@ export default {
             return Math.floor(interval) + " دقائق" + " مضت";
         }
         return Math.floor(seconds) + " ثوانٍ" + " مضت";
-
     },
     capitalizeFirstLetter(string) {
         return string.charAt(0).toUpperCase() + string.slice(1);
@@ -117,7 +124,6 @@ export default {
     },
     showValidationErrors(res, toast) {
         if (res.response && res.response.status === 422) {
-            console.log(res.response);
             [...Object.values(res.response.data.errors)].forEach((e) => {
                 toast.add({
                     severity: "error",

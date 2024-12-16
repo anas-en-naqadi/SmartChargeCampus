@@ -26,6 +26,10 @@ export const setupAxiosInterceptors = (router) => {
             if (error.response && error.response.status === 500) {
                 router.push({ name: "serverError" }); // Redirect to notFound page
             }
+             if (error.response && error.response.status === 403) {
+                 router.push({ name: "forbidden" }); // Redirect to notFound page
+             }
+
 
             return Promise.reject(error);
         }

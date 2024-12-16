@@ -3,13 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\companyRequest;
-use App\Models\Client;
+use App\Http\Requests\UpdateStudentRequest;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Services\UserService;
 
-use Illuminate\Support\Facades\URL;
 
 class UserController extends Controller
 {
@@ -20,36 +18,26 @@ class UserController extends Controller
         $this->userService = $userService;
     }
 
-    public function updateCompanyInfo(CompanyRequest $request)
-    {
-        $user = $this->userService->updateCompanyInfo($request);
-
-        return response()->json([
-            'message' => 'تم تحديث معلومات المحل بنجاح',
-            'user' => $user->load('company'),
-        ]);
-    }
 
 
 
-    public function updateUserProfile(Request $request)
+
+    public function updateUserProfile(UpdateStudentRequest $request)
     {
 
         $user = $this->userService->updateUserProfile($request);
 
-        // Return a success response with the updated user data
         return response()->json([
-            'message' => 'تم تحديث معلومات المستخدم بنجاح',
-            'user' => $user->load('company') // Eager load the company relationship
+            'message' => 'Votre profil a été mis à jour.',
+            'user' => $user->load('student') // Eager load the company relationship
         ]);
     }
 
 
     public function destroy(User $user)
     {
-
-
         $user->delete();
+        saveActivity($user, $user->name . ' Utilisateur supprimé.', 'delete-user');
         return response('successfful');
     }
 
@@ -59,17 +47,11 @@ class UserController extends Controller
     {
         $this->userService->updatePass($request);
         // Return success message
-        return response()->json(['message' => 'تم تحديث كلمة المرور بنجاح']);
+        return response()->json(['message' => 'Le mot de passe a été mis à jour avec succès']);
     }
 
 
 
-    public function oneUser($id)
-    {
-        $user = User::whereId($id)->get();
-
-        return response()->json($user);
-    }
 
 
 
@@ -82,23 +64,12 @@ class UserController extends Controller
     {
         $cacheKey = 'user';
         $cachedData = getCachedData($cacheKey, function () {
-            $user = getSimpleUser()->load('company');
-            if($user->company){
-                $user->company->logo = URL::to($user->company?->logo);
-                $user->company->save();
-            }
+            $user = getSimpleUser();
 
-            return $user;
+
+            return  $user->isAdmin() ? $user :  $user->load('student');
         });
 
         return response()->json($cachedData);
-    }
-
-    public function getLastCustomers()
-    {
-        $clients = Client::latest()->limit(7)->get();
-
-
-        return response()->json($clients);
     }
 }

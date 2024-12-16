@@ -8,7 +8,7 @@
                 [`hover:bg-${props.color}-200`]: loading,
 
               }]"
-              type="button"
+              type="submit"
 
               class="flex w-full justify-center items-center mt-8 rounded-md  p-2 text-md text-center font-semibold leading-6 text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             >

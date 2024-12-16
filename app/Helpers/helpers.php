@@ -1,31 +1,27 @@
 <?php
 
-use App\Models\Category;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\File;
+
 use Stevebauman\Purify\Facades\Purify;
-use Illuminate\Support\Str;
 
 use Illuminate\Support\Facades\Redis;
-use Spatie\LaravelImageOptimizer\Facades\ImageOptimizer;
 
 function getSimpleUser()
 {
     return auth()->check() ? auth()->user() : null;
 }
-function getCachedData($cacheKey, $callback)
-{
-    if (Redis::exists($cacheKey)) {
-        return json_decode(Redis::get($cacheKey));
+    function getCachedData($cacheKey, $callback)
+    {
+        if (Redis::exists($cacheKey)) {
+            return json_decode(Redis::get($cacheKey));
+        }
+
+        $data = $callback();
+
+        Redis::set($cacheKey, json_encode($data));
+        Redis::expire($cacheKey, 60 * 60);
+        return $data;
     }
-
-    $data = $callback();
-
-    Redis::set($cacheKey, json_encode($data));
-    Redis::expire($cacheKey, 60 * 60);
-    return $data;
-}
 function saveActivity(Model $subject, $description = '', $action = '')
 {
     Redis::del("activities");
@@ -48,30 +44,15 @@ function saveActivity(Model $subject, $description = '', $action = '')
 }
 
 
-function storeImage($image)
-{
-    if (preg_match('/^data:image\/(\w+);base64,/', $image, $type)) {
-        $image = substr($image, strpos($image, ','));
-        $type = strtolower($type[1]);
-        if (!in_array($type, ['jpg', 'jpeg', 'png', 'gif'])) {
-            throw new Exception('invalid image type');
-        }
-        $image = str_replace('', '+', $image);
-        $image = base64_decode($image);
-    } else {
-        throw new Exception('did not match data urL with image');
-    }
-    $dir = 'storage/images/products/';
-    $file = Str::random() . '.' . $type;
-    $absolutePath = public_path($dir);
-    $relativePath = $dir . $file;
-    if (!File::exists($absolutePath)) {
-        File::makeDirectory($absolutePath, 0755, true);
-    }
-
-    file_put_contents($relativePath, $image);
-    ImageOptimizer::optimize($absolutePath);
-    return $relativePath;
+function clearDashboards(){
+    Redis::del('weekly_charge_data');
+    Redis::del('monthly_charge_data');
+    Redis::del('user_dashboard_data');
+    Redis::del('admin_dashboard_data');
+    Redis::del('paid_amount_each_week');
+    Redis::del('paid_amount_each_month');
+    Redis::del('payment_status_percentage');
+    Redis::del('ports_per_station');
 }
 
 

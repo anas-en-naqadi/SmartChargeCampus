@@ -3,8 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use Exception;
-use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Socialite\Facades\Socialite;
@@ -23,51 +22,23 @@ class SocialiteController extends Controller
     public function handleGoogleCallback()
     {
 
-            $user = Socialite::driver('google')->stateless()->user();
+        $user = Socialite::driver('google')->stateless()->user();
 
-            $findUser = User::where('social_id', $user->id)->first();
-            if ($findUser) {
-                Auth::login($findUser);
-                $token = $findUser->createToken('main')->plainTextToken;
-                return response()->json(['token' => $token, 'user' => $findUser]);
-            } else {
-                $newUser = User::create([
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'social_id' => $user->id,
-                    'phone' => null,
-                    'social_type' => 'google',
-                    'password' => Hash::make($user->password)
-                ]);
-                Auth::login($newUser);
-                $token = $newUser->createToken('main')->plainTextToken;
-                return response()->json(['token' => $token, 'user' => $newUser]);
-            }
-
-    }
-    public function handleFacebookCallback()
-    {
-        try {
-            $user = Socialite::driver('facebook')->user();
-            $findUser = User::where('social_id', $user->id)->first();
-            if ($findUser) {
-                Auth::login($findUser);
-                $token = $findUser->createToken('main')->plainTextToken;
-                return response()->json(['token' => $token, 'user' => $findUser]);
-            } else {
-                $newUser = User::create([
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'social_id' => $user->id,
-                    'social_type' => 'facebook',
-                    'password' => Hash::make($user->password)
-                ]);
-                Auth::login($newUser);
-                $token = $newUser->createToken('main')->plainTextToken;
-                return response()->json(['token' => $token, 'user' => $newUser]);
-            }
-        } catch (Exception $e) {
-            return response()->json(['message' => 'oops, something went wrong pls try again later']);
+        $findUser = User::where('email', $user->getEmail())->first();
+        if ($findUser) {
+            Auth::login($findUser);
+        } else {
+            $findUser = User::create([
+                'name' => $user->getName(),
+                'email' => $user->getEmail(),
+                'google_id' => $user->getId(),
+                'password' => Hash::make(Str::random(16)),
+            ]);
+            Auth::login($findUser);
         }
+        $token = $findUser->createToken('main')->plainTextToken;
+
+        return response()->json(['token' => $token, 'user' => $findUser]);
+
     }
 }

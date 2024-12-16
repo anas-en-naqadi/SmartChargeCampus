@@ -2,44 +2,89 @@
 
 namespace App\Models;
 
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, Notifiable, HasFactory;
+    use HasFactory, Notifiable,HasApiTokens;
 
-    protected $fillable = ['name', 'phone', 'password', 'email'];
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+        'role',  // e.g., 'student', 'admin'
+    ];
 
-    public function transporters(){
-        return $this->hasMany(Client::class,'user_id')->where("role","transporter");
-    }
-    public function clients()
+    /**
+     * The attributes that should be hidden for arrays.
+     *
+     * @var array
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+    ];
+
+    public function charge_stations()
     {
-        return $this->hasMany(Client::class, 'user_id')->where("role",  "client");
-    }
-    public function purchases() {
-        return $this->hasMany(Purchase::class);
+        return $this->hasMany(ChargingStation::class);
     }
 
-    public function sells(){
-        return $this->hasMany(Sell::class, 'user_id');
-    }
-    public function expenses(){
-        return $this->hasMany(Expense::class, 'user_id');
-    }
-    public function company(){
 
-        return $this->hasOne(Company::class,'user_id');
+    public function student(){
+        return $this->hasOne(Student::class);
     }
-    public function categories(){
-        return $this->hasMany(Category::class,'user_id');
+
+
+
+    /**
+     * Check if the user has any upcoming reservations.
+     *
+     * @return bool
+     */
+    public function hasUpcomingReservation()
+    {
+        return $this->reservations()->where('start_time', '>', now())->exists();
     }
-    public function products(){
-        return $this->hasMany(Product::class,'user_id');
+
+    /**
+     * Role-based access control for users.
+     * For example, check if the user is an admin.
+     */
+    public function isAdmin()
+    {
+        return $this->role === 'admin';
+    }
+
+    /**
+     * Add a new reservation for the user.
+     */
+    public function addReservation($station_id, $start_time, $end_time)
+    {
+        return $this->reservations()->create([
+            'station_id' => $station_id,
+            'start_time' => $start_time,
+            'end_time' => $end_time,
+            'status' => 'pending', // You can set a default status here
+        ]);
     }
 }
-
