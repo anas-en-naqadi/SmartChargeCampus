@@ -153,7 +153,7 @@ function login() {
         })
         .catch((err) => {
             loading.value = false;
-        });
+        }).finally(()=>loading.value = false);
 }
 function google() {
     window.location.href = "http://127.0.0.1:8000/auth/google"

@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\StudentResource;
 use App\Models\Student;
-use Illuminate\Http\Request;
 
 class StudentController extends Controller
 {
@@ -12,7 +11,9 @@ class StudentController extends Controller
     {
         $cacheKey = 'students';
         $cacheData = getCachedData($cacheKey, function () {
-            return Student::with('user')->get();
+            return Student::with(['user' => function ($query) {
+                $query->where('role', 'student'); // Assuming 'role' is in the users table
+            }])->get();
         });
 
         saveActivity(new Student(),'L\'administrateur ' .getSimpleUser()->name . ' a Consultée les Etudiants', 'consulte-etudiants');

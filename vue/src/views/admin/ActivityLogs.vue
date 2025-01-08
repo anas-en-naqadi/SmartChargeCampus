@@ -39,13 +39,13 @@
                 </Column>
                 <Column field="log_name" header="Opération" class="border-b-[1px] text-center">
                     <template #body="{ data }">
-                        <span>{{ data.log_name }}</span>
+                        <span>{{ data.properties.action }}</span>
                     </template>
                 </Column>
 
                 <Column field="" header="Appareil" class="border-b-[1px] text-center">
                     <template #body="{ data }">
-                        <span>{{ data.properties }}</span>
+                        <span>{{ data.properties.ip }}</span>
                     </template>
                 </Column>
 

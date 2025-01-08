@@ -300,7 +300,7 @@ function filterTable(event) {
     else
         filteredReservations.value = reservations.value.filter(
             (p) =>
-                p.cne.toLowerCase().includes(filter) || p.student_name.toLowerCase().includes(filter) || p.charging_station.toLowerCase().includes(filter)
+                p.cne.toLowerCase().includes(filter) || p.student_name.toLowerCase().includes(filter) || p.charging_station.toLowerCase().includes(filter) || p.reservation_code.toLowerCase().includes(filter)
         );
 }
 

@@ -5,6 +5,7 @@ const axiosClient = axios.create({
     baseURL: `${import.meta.env.VITE_BASE_BACKEND_URL}/api`,
 });
 
+const url = import.meta.env.VITE_FRONT_URL;
 // Create a function to set up interceptors
 export const setupAxiosInterceptors = (router) => {
     axiosClient.interceptors.request.use((config) => {
@@ -21,13 +22,13 @@ export const setupAxiosInterceptors = (router) => {
             }
 
             if (error.response && error.response.status === 404) {
-                router.push({ name: "notFound" }); // Redirect to notFound page
+                window.location.href= `${url}/notFound` // Redirect to notFound page
             }
             if (error.response && error.response.status === 500) {
-                router.push({ name: "serverError" }); // Redirect to notFound page
+                window.location.href= `${url}/serverError` // Redirect to notFound page
             }
              if (error.response && error.response.status === 403) {
-                 router.push({ name: "forbidden" }); // Redirect to notFound page
+                 window.location.href = `${url}/forbidden`; // Redirect to notFound page
              }
 
 

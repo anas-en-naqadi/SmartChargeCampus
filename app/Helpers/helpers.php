@@ -24,23 +24,20 @@ function getSimpleUser()
     }
 function saveActivity(Model $subject, $description = '', $action = '')
 {
-    Redis::del("activities");
+    $user = getSimpleUser(); // Assuming this function returns the authenticated user
 
-    $user = getSimpleUser();
-
-    $ipAddress = request()->ip();
+    $ipAddress = request()->ip(); // Get the IP address of the user
 
     // Log the activity
     activity()
-        ->log($description)                   // Description of the action
         ->performedOn($subject)               // The model on which the action is performed
         ->causedBy($user)                     // The user who caused the action
-        ->logName($action)                    // The type of action (log name)
         ->withProperties([                    // Additional properties (like IP address)
             'ip' => $ipAddress,
+            'action' => $action,              // Adding the action as a custom property
         ])
+        ->log($description)                   // Description of the action
         ->save();                             // Save the activity
-
 }
 
 
