@@ -102,7 +102,7 @@
 
 }
 main {
-  background-image: url("../../assets/images/smart_charge_campus_background.jpeg");
+  background-image: url("/svgs/background.svg");
   background-repeat: no-repeat;
   background-size: cover;
 }
@@ -139,7 +139,7 @@ function login() {
                 setTimeout(() => {
 
                     window.location.href = res.data.user.role === 'admin' ? `${import.meta.env.VITE_FRONT_URL}/admin/dashboard` : `${import.meta.env.VITE_FRONT_URL}/dashboard`;
-                }, 1300);
+                }, 1000);
             }
             if (res.status === 422 && res.response) {
                 errorMsg.value = [...Object.values(res.response.data.errors)];

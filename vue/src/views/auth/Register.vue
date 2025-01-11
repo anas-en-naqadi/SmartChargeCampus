@@ -140,9 +140,10 @@
 main {
     width: 100%;
     height: 100%;
-    background-image: url("../../assets/images/smart_charge_campus_background.jpeg");
-    background-repeat: no-repeat;
-    background-size: cover;
+
+    background-image: url("/svgs/background.svg");
+        background-repeat: no-repeat;
+        background-size: cover;
 }
 </style>
 <script setup>
@@ -171,6 +172,7 @@ function register() {
         .dispatch("register", user)
         .then((res) => {
             loading.value = false;
+            errorMsg.value = [];
 
             if (res.status == 200 && res.data) {
                 document.querySelector("#success").classList.remove("hidden");

@@ -11,9 +11,9 @@ class StudentController extends Controller
     {
         $cacheKey = 'students';
         $cacheData = getCachedData($cacheKey, function () {
-            return Student::with(['user' => function ($query) {
+            return Student::whereHas('user' , function ($query) {
                 $query->where('role', 'student'); // Assuming 'role' is in the users table
-            }])->get();
+            })->with('user')->get();
         });
 
         saveActivity(new Student(),'L\'administrateur ' .getSimpleUser()->name . ' a Consultée les Etudiants', 'consulte-etudiants');

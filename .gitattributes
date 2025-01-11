@@ -1,11 +1,14 @@
+# Set default behavior to automatically normalize line endings
 * text=auto eol=lf
 
+# Specify diff attributes for common file types
 *.blade.php diff=html
 *.css diff=css
 *.html diff=html
 *.md diff=markdown
 *.php diff=php
 
+# Exclude specific files or directories from export
 /.github export-ignore
 CHANGELOG.md export-ignore
 .styleci.yml export-ignore

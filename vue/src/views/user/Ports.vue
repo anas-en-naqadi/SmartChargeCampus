@@ -8,7 +8,7 @@
                 <Skeleton v-else width="12rem" />
             </h2>
 
-            <Button v-if="user.role === 'admin'" :disabled="!loading" @click="visible = true" label="+ nouveau Port"
+            <Button v-if="user.role === 'admin'" :disabled="!loading" @click="visible = !visible" label="+ nouveau Port"
                 class="p-button-outlined h-10 bg-white py-2 2xl:px-3 px-1 mr-6 border border-black rounded-md text-black hover:text-white hover:bg-black w-full sm:w-auto" />
 
         </div>
@@ -19,7 +19,7 @@
                     :title="`Reserver Le port ${port.port_number}`">
                     <span
                         :class="[port.status === 'disponible' ? 'text-green-500' : (port.status === 'indisponible' ? 'text-red-500' : 'text-orange-500'), 'font-bold -mt-4 text-xl']">{{
-                        port.port_number }}</span>
+                            port.port_number }}</span>
                     <div v-if="user.role === 'student'">
                         <button @click="visible = !visible; actualPort = port">
                             <svg v-if="port.status === 'indisponible'" xmlns=" http://www.w3.org/2000/svg" fill="none"
@@ -101,7 +101,7 @@
                 </div>
             </div>
             <div v-else>
-                <div v-if="user.role==='admin'" class="flex gap-2 items-center pb-4 justify-center ">
+                <div v-if="user.role === 'admin'" class="flex gap-2 items-center pb-4 justify-center ">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                         stroke="currentColor" class="size-8 text-red-500">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -203,7 +203,7 @@
 
 <script setup>
 import Buton from '../../components/Button.vue';
-import { computed, onMounted, reactive, ref } from 'vue';
+import { computed, onMounted, reactive, ref,watch } from 'vue';
 import { useRoute } from 'vue-router';
 import store from '../../store';
 import common from '../../utils/common';
@@ -220,6 +220,13 @@ const loaderButton = ref(false);
 const user = computed(() => store.state.user.data);
 const visible = ref(false);
 let actualPort = {};
+
+watch(visible, (newVal) => {
+    if (!newVal) {
+        port = { charging_station_id: chargeStationId };
+        console.log("hy")
+    }
+});
 onMounted(() => {
     chargeStationId.value = atob(route.params.portN);
     if (chargeStationId.value) getChargeStationPorts(chargeStationId.value);
@@ -254,7 +261,7 @@ function reserveThisPort(port) {
 
                     });
                 }
-            }).finally(()=>document.body.style.cursor = "wait");
+            }).finally(() => document.body.style.cursor = "wait");
     } else {
         visible.value = false;
         common.showToast({ title: "Ce port est déja réservé !!", icon: "warning" });;
@@ -413,6 +420,7 @@ function addPort() {
 }
 function make_changes(res, method) {
     loaderButton.value = false;
+    port = { charging_station_id: chargeStationId.value };
 
     visible.value = false;
     common.showToast({ title: res.data.message, icon: "success" });
@@ -426,7 +434,6 @@ function make_changes(res, method) {
     } else
         ports.push(res.data.port);
 
-    port = { charging_station_id: chargeStationId.value };
 
 }
 </script>

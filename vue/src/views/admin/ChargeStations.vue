@@ -4,7 +4,7 @@
             <h2 class="mb-3 text-2xl font-extrabold tracking-tight text-gray-900 p-8">
                 Liste des stations de recharge
             </h2>
-            <Button :disabled="loading" @click="visible1 = true" label="+ Nouvelle station"
+            <Button :disabled="loading" @click="visible1 = !visible1" label="+ Nouvelle station"
                 class="p-button-outlined h-10 bg-white py-2 px-3 mr-6 border border-black rounded-md text-black hover:text-white hover:bg-black" />
 
         </div>
@@ -209,12 +209,18 @@ import { useRouter } from "vue-router";
 const toast = useToast();
 const skeletonObjects = new Array(10);
 const router = useRouter();
-const charge_station = reactive({});
+let charge_station = reactive({});
 const loaderButton = ref(false);
 const chargeStations = computed(() => store.state.charge_stations);
 const filteredChargeStations = ref([]);
 const visible1 = ref(false);
 const loading = ref(true);
+
+watch(visible1, (newVal) => {
+    if (!newVal) {
+       charge_station ={};
+    }
+});
 
 onMounted(() => {
     getChargeStations();
@@ -273,7 +279,7 @@ function switchActions() {
 
 function addNewCharge_station() {
     visible1.value = true;
-
+    Object.assign(charge_station,{});
     loaderButton.value = true;
 
 

@@ -85,8 +85,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         $cacheKey = 'activities';
 
         $cachedData = getCachedData($cacheKey, function () {
-            $activities = Activity::causedBy(getSimpleUser())->with('causer')->latest()->get();
-
+            $activities = Activity::with('causer')->latest()->get();
             return $activities;
         });
 

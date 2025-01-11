@@ -17,7 +17,7 @@ class AuthService
         if (Auth::attempt($credentials, $credentials['remember'] ?? false)) {
             $user = Auth::user();
             $token = $user->createToken('main')->plainTextToken;
-            saveActivity($user, 'L\'utilisateur ' . $user->name . ' s\'est connecté avec succès.', 'connexion');
+saveActivity($user, ($user->isAdmin() ? 'L\'administrateur ' : 'L\'utilisateur ') . $user->name . ' s\'est connecté avec succès.', 'connexion');
             return ['user' => $user, 'token' => $token];
         }
 

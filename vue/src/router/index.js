@@ -13,6 +13,14 @@ const routes = [
         children: [...AdminRouter, ...UserRoutes],
     },
     {
+        path: "/",
+        name: "home",
+        meta: {
+            title: "Smart Charge Campus - Home",
+        },
+        component: () => import("@/views/user/Home.vue"),
+    },
+    {
         path: "/login",
         name: "login",
         meta: {

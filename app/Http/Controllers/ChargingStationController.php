@@ -22,7 +22,7 @@ class ChargingStationController extends Controller
             $charging_stations = ChargingStation::latest()->get();
             return $charging_stations;
         });
-        saveActivity(new ChargingStation(), 'L\'administrateur ' . getSimpleUser()->name . ' a Consultée les stations de recharges', 'consulte-station-recharges');
+        saveActivity(new ChargingStation(), getSimpleUser()->isAdmin() ? 'L\'administrateur ' : 'L\'utulisateur ' . getSimpleUser()->name . ' a Consultée les stations de recharges', 'consulte-station-recharges');
 
         return response()->json($cacheData, 200);
     }

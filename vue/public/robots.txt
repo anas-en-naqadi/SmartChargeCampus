@@ -1,0 +1,12 @@
+# robots.txt for SmartChargeCampus
+
+# Allow all bots to crawl everything
+User-agent: *
+Disallow:
+
+# Prevent bots from crawling sensitive data
+Disallow: /admin/
+Disallow: /login/
+
+# Sitemap location
+Sitemap: https://smartchargecampus.space/sitemap.xml

@@ -36,8 +36,8 @@ const store = createStore({
         },
         DELETE_USER(state) {
             sessionStorage.removeItem("TOKEN");
-            state.user.data = {};
             state.user.token = null;
+            
         },
     },
     modules: {},
